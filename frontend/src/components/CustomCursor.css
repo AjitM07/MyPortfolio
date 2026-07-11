@@ -1,51 +1,46 @@
-/* Custom Cursor CSS */
+/* Custom Cursor — professional white dot + ring */
 
-/* Hide default cursor on the whole viewport and interactive elements */
 html,
-body, 
-a, 
-button, 
-input, 
-textarea, 
-select, 
-.glass-button, 
-.nav-item {
+body,
+a,
+button,
+input,
+textarea,
+select {
   cursor: none !important;
 }
 
-/* Custom Cursor Elements */
 .custom-cursor-dot {
-  width: 6px;
-  height: 6px;
-  background-color: var(--color-accent-blue);
+  width: 7px;
+  height: 7px;
+  background-color: #ffb957;
   border-radius: 50%;
   position: fixed;
-  top: -3px; /* Center alignment offset */
-  left: -3px;
+  top: -2.5px;
+  left: -2.5px;
   pointer-events: none;
   z-index: 9999;
-  box-shadow: 0 0 10px var(--color-accent-blue);
   will-change: transform;
 }
 
 .custom-cursor-ring {
-  width: 36px;
-  height: 36px;
-  border: 1.5px solid var(--color-accent-blue);
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   position: fixed;
-  top: -18px; /* Center alignment offset */
-  left: -18px;
+  top: -15px;
+  left: -15px;
   pointer-events: none;
   z-index: 9998;
-  opacity: 0.7;
+  opacity: 0.6;
   will-change: transform;
-  transition: width 0.2s, height 0.2s, border-color 0.2s, top 0.2s, left 0.2s, opacity 0.2s;
+  transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease,
+    top 0.2s ease, left 0.2s ease;
 }
 
-/* Hover effects */
+/* Hover: ring expands slightly, more visible */
 .custom-cursor-dot.hovered {
-  background-color: var(--color-accent-purple);
   width: 4px;
   height: 4px;
   top: -2px;
@@ -53,30 +48,27 @@ select,
 }
 
 .custom-cursor-ring.hovered {
-  width: 50px;
-  height: 50px;
-  top: -25px;
-  left: -25px;
-  border-color: var(--color-accent-purple);
-  background-color: rgba(168, 85, 247, 0.05);
+  width: 42px;
+  height: 42px;
+  top: -21px;
+  left: -21px;
+  border-color: rgba(255, 255, 255, 0.8);
   opacity: 1;
 }
 
-/* Hide custom cursor on mobile devices */
+/* Hide on mobile */
 @media (max-width: 900px) {
   .custom-cursor-dot,
   .custom-cursor-ring {
     display: none;
   }
   html,
-  body, 
-  a, 
-  button, 
-  input, 
-  textarea, 
-  select, 
-  .glass-button, 
-  .nav-item {
+  body,
+  a,
+  button,
+  input,
+  textarea,
+  select {
     cursor: auto !important;
   }
 }

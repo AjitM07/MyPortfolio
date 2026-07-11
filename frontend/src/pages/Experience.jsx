@@ -38,21 +38,21 @@ const Experience = () => {
       <h1 className="text-4xl font-extrabold text-center mb-16 tracking-wide gradient-text text-glow">
         Professional Journey
       </h1>
-      
+
       {experiences.length === 0 ? (
         <div className="glass-panel p-10 text-center text-text-secondary">
           No experience items found. Add some in the Admin Panel!
         </div>
       ) : (
-        <div className="relative max-w-4xl mx-auto py-8 after:content-[''] after:absolute after:w-[2px] after:bg-gradient-to-b after:from-accent-blue after:to-accent-purple after:via-transparent after:top-0 after:bottom-0 after:left-[31px] md:after:left-1/2 after:-translate-x-1/2">
+        <div className="relative max-w-7xl mx-auto py-8 after:content-[''] after:absolute after:w-[2px] after:bg-gradient-to-b after:from-accent-blue after:to-accent-purple after:via-transparent after:top-0 after:bottom-0 after:left-[31px] md:after:left-1/2 after:-translate-x-1/2">
           {experiences.map((exp, index) => (
-            <div 
-              key={exp._id} 
+            <div
+              key={exp._id}
               className="relative w-full flex flex-col md:flex-row my-8 pl-16 md:pl-0"
             >
               {/* Timeline Bullet Dot */}
               <div className="absolute w-4 h-4 bg-bg-primary border-3 border-accent-blue rounded-full z-10 shadow-[0_0_10px_rgba(0,240,255,0.6)] top-[30px] left-[23px] md:left-1/2 md:-translate-x-1/2"></div>
-              
+
               {/* Timeline Content Card */}
               <div className={`w-full md:w-[45%] glass-panel p-8 relative ${index % 2 === 0 ? 'md:mr-auto' : 'md:ml-auto'}`}>
                 <div className="text-sm font-semibold text-accent-blue mb-2">

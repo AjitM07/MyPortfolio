@@ -15,17 +15,19 @@ const storage = new CloudinaryStorage({
     
     // Default format and resource type
     let resource_type = 'image';
+    let format = 'png';
     
     if (file.mimetype === 'application/pdf' || file.originalname.endsWith('.pdf')) {
-      resource_type = 'raw';
+      resource_type = 'image'; // Bypasses Cloudinary's "untrusted raw" block by uploading PDF as image
+      format = 'pdf';
     }
     
     return {
       folder: folder,
       resource_type: resource_type,
-      // For raw files like PDF, we don't specify format, otherwise it may break
-      format: file.mimetype === 'application/pdf' ? undefined : 'png', 
-      public_id: `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9]/g, '_')}`
+      format: format,
+      // Keep the file extension (allow dots) so Cloudinary URL ends with .pdf
+      public_id: `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')}`
     };
   }
 });

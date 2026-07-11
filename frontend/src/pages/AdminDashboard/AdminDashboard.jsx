@@ -5,7 +5,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState({
     name: '', title: '', bio: '',
-    socialLinks: { github: '', linkedin: '', twitter: '', email: '' }
+    socialLinks: { github: '', linkedin: '', twitter: '', instagram: '', email: '' }
   });
   const [aboutImageFile, setAboutImageFile] = useState(null);
   const [resumeFile, setResumeFile] = useState(null);
@@ -112,6 +112,7 @@ const AdminDashboard = () => {
       fd.append('github', profile.socialLinks.github || '');
       fd.append('linkedin', profile.socialLinks.linkedin || '');
       fd.append('twitter', profile.socialLinks.twitter || '');
+      fd.append('instagram', profile.socialLinks.instagram || '');
       fd.append('email', profile.socialLinks.email || '');
 
       if (aboutImageFile) fd.append('aboutImage', aboutImageFile);
@@ -469,6 +470,18 @@ const AdminDashboard = () => {
                   onChange={(e) => setProfile({
                     ...profile,
                     socialLinks: { ...profile.socialLinks, twitter: e.target.value }
+                  })}
+                />
+              </div>
+              <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Instagram Link</label>
+                <input
+                  type="url"
+                  className="glass-input"
+                  value={profile.socialLinks.instagram || ''}
+                  onChange={(e) => setProfile({
+                    ...profile,
+                    socialLinks: { ...profile.socialLinks, instagram: e.target.value }
                   })}
                 />
               </div>

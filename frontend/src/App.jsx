@@ -31,7 +31,7 @@ function App() {
         <Navbar />
 
         {/* Main Routing Container */}
-        <main className="pt-10 pb-20 min-h-[calc(100vh-160px)] relative z-1 flex-1">
+        <main className="relative z-1 flex-1 flex flex-col">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/experience" element={<Experience />} />

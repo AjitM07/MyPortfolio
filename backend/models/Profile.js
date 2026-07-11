@@ -16,6 +16,7 @@ const ProfileSchema = new mongoose.Schema({
     github: { type: String, default: '' },
     linkedin: { type: String, default: '' },
     twitter: { type: String, default: '' },
+    instagram: { type: String, default: '' },
     email: { type: String, default: '' }
   }
 }, { timestamps: true });

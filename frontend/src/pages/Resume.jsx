@@ -40,11 +40,8 @@ const Resume = () => {
           <>
             <div className="flex gap-4 justify-center flex-wrap mb-2">
               <a
-                href={resumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/api/profile/download-resume"
                 className="glass-button active cursor-none"
-                download
               >
                 📥 Download PDF Resume
               </a>

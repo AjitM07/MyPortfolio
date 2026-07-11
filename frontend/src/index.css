@@ -1,50 +1,67 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-bg-primary: #030616;
-  --color-bg-card: rgba(10, 15, 30, 0.6);
-  --color-border-glass: rgba(255, 255, 255, 0.08);
-  --color-accent-blue: #00f0ff;
-  --color-accent-purple: #a855f7;
-  --color-accent-pink: #ff2d55;
-  --color-text-primary: #f3f4f6;
-  --color-text-secondary: #9ca3af;
+  --color-bg-primary: #0a0a0a;
+  --color-bg-card: rgba(18, 18, 18, 0.8);
+  --color-border-subtle: rgba(255, 255, 255, 0.07);
+  --color-border-medium: rgba(255, 255, 255, 0.12);
 
-  --font-sans: 'Outfit', sans-serif;
-  --animate-float: float 4s ease-in-out infinite;
-  --animate-pulse-glow: pulse-glow 2s infinite ease-in-out;
+  /* Single refined accent — warm off-white, no neon */
+  --color-accent: #e8e3d9;
+  --color-accent-dim: rgba(232, 227, 217, 0.5);
+
+  /* Legacy aliases kept so old Tailwind classes don't break layout */
+  --color-accent-blue: #e8e3d9;
+  --color-accent-purple: #e8e3d9;
+  --color-accent-pink: #e8e3d9;
+  --color-bg-card: rgba(18, 18, 18, 0.8);
+  --color-border-glass: rgba(255, 255, 255, 0.07);
+
+  --color-text-primary: #f0ede8;
+  --color-text-secondary: #6b7280;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  flex: 1;
 }
 
-/* Custom Scrollbars */
+/* Custom Scrollbars — subtle, professional */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-accent-blue) var(--color-bg-primary);
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-primary);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 240, 255, 0.3);
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent-blue);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Particles Canvas */
@@ -58,85 +75,77 @@
   pointer-events: none;
 }
 
-/* Custom Cursor Hide Default */
+/* Custom Cursor — hide default */
 html,
-body, 
-a, 
-button, 
-input, 
-textarea, 
+body,
+a,
+button,
+input,
+textarea,
 select {
   cursor: none !important;
 }
 
-/* Custom Utilities for Glassmorphism & Neon */
+/* ── Clean card panel — no blur, no neon ── */
 @utility glass-panel {
   background: var(--color-bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--color-border-glass);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  transition: border-color 0.2s ease;
 
   &:hover {
-    border-color: rgba(0, 240, 255, 0.3);
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+    border-color: var(--color-border-medium);
   }
 }
 
+/* ── Clean outlined button ── */
 @utility glass-button {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--color-border-glass);
+  background: transparent;
+  border: 1px solid var(--color-border-medium);
   color: var(--color-text-primary);
   padding: 10px 24px;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 500;
-  border-radius: 30px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
   cursor: none !important;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 
   &:hover {
-    background: rgba(0, 240, 255, 0.1);
-    border-color: var(--color-accent-blue);
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
   }
 }
 
-@utility glass-button-active {
-  background: linear-gradient(135deg, var(--color-accent-blue), var(--color-accent-purple));
-  border-color: transparent;
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
-}
-
+/* ── Clean text input ── */
 @utility glass-input {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--color-border-glass);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
   padding: 12px 16px;
   color: var(--color-text-primary);
   outline: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s ease, background 0.2s ease;
   width: 100%;
+  font-family: var(--font-sans);
 
   &:focus {
-    border-color: var(--color-accent-blue);
-    background: rgba(255, 255, 255, 0.04);
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
   }
 }
 
+/* ── Remove neon glow — now just a very faint luminance ── */
 @utility text-glow {
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+  text-shadow: none;
 }
 
+/* ── Remove neon gradient text ── */
 @utility gradient-text {
-  background: linear-gradient(135deg, var(--color-accent-blue) 0%, var(--color-accent-purple) 50%, var(--color-accent-pink) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-text-primary);
 }

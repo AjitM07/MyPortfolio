@@ -13,22 +13,22 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
-  const navItemClass = ({ isActive }) => 
-    `text-base font-medium transition-all duration-300 relative py-2 px-3 cursor-none ` +
-    `after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:bg-accent-blue after:shadow-[0_0_8px_var(--color-accent-blue)] after:transition-all after:duration-300 ` +
-    (isActive 
-      ? 'text-accent-blue text-glow after:w-3/5' 
-      : 'text-text-secondary hover:text-text-primary hover:text-glow after:w-0 hover:after:w-3/5');
+  const navItemClass = ({ isActive }) =>
+    `text-[0.9rem] font-medium tracking-wide transition-colors duration-200 relative py-1 px-0 cursor-none ` +
+    `after:content-[''] after:absolute after:bottom-[-2px] after:left-0 after:h-px after:transition-all after:duration-200 ` +
+    (isActive
+      ? 'text-white after:w-full after:bg-white'
+      : 'text-[#6b7280] hover:text-[#d1cdc7] after:w-0 hover:after:w-full after:bg-[#d1cdc7]');
 
   return (
-    <nav className="sticky top-0 left-0 w-full z-50 px-[5%] py-4 glass-panel rounded-b-2xl border-t-0 border-l-0 border-r-0 shadow-lg border-b border-border-glass backdrop-blur-md">
+    <nav className="sticky top-0 left-0 w-full z-50 px-[5%] py-5 bg-transparent">
       <div className="flex justify-between items-center max-w-6xl mx-auto w-full">
-        <Link to="/" className="text-2xl font-extrabold tracking-widest gradient-text text-glow cursor-none" onClick={() => setIsOpen(false)}>
-          AJIT
+        <Link to="/" className="text-base font-semibold tracking-[0.15em] text-[#e8e3d9] hover:text-white transition-colors duration-200 cursor-none" onClick={() => setIsOpen(false)}>
+          &lt; AJIT's Portfolio / &gt;
         </Link>
 
         {/* Hamburger Menu Toggle Button */}
-        <button 
+        <button
           className="flex flex-col justify-around w-6 h-5 bg-transparent border-none cursor-none p-0 z-50 md:hidden"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle navigation"
@@ -64,10 +64,10 @@ const Navbar = () => {
 
           {admin ? (
             <>
-              <NavLink to="/admin" className={({ isActive }) => `text-base font-medium py-2 px-4 border border-accent-purple/40 rounded-lg text-accent-purple hover:bg-accent-purple/10 hover:text-white hover:text-glow transition-all duration-300 cursor-none ${isActive ? 'bg-accent-purple/20 text-white' : ''}`} onClick={() => setIsOpen(false)}>
+              <NavLink to="/admin" className={({ isActive }) => `text-[0.9rem] font-medium py-1.5 px-4 border border-white/10 rounded text-[#c8c3bb] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none ${isActive ? 'text-white border-white/25' : ''}`} onClick={() => setIsOpen(false)}>
                 Dashboard
               </NavLink>
-              <button className="text-base font-medium py-2 px-4 border border-accent-pink/40 rounded-lg text-accent-pink hover:bg-accent-pink/10 hover:text-white hover:text-glow transition-all duration-300 cursor-none" onClick={handleLogout}>
+              <button className="text-[0.9rem] font-medium py-1.5 px-4 border border-white/10 rounded text-[#6b7280] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none" onClick={handleLogout}>
                 Logout
               </button>
             </>
