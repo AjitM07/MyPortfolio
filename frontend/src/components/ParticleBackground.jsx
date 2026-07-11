@@ -23,40 +23,52 @@ const ParticleBackground = () => {
         stroke: {
           width: 0,
           color: '#000000'
+        },
+        polygon: {
+          nb_sides: 4
         }
       },
       opacity: {
-        value: 0.3,
-        random: true,
+        value: 0.5,
+        random: false,
         anim: {
-          enable: true,
+          enable: false,
           speed: 1,
           opacity_min: 0.1,
           sync: false
         }
       },
       size: {
-        value: 3,
+        value: 2,
         random: true,
         anim: {
           enable: false,
-          speed: 40,
+          speed: 10,
           size_min: 0.1,
           sync: false
         }
       },
+      // Backward compatibility keys
       line_linked: {
         enable: true,
         distance: 150,
-        color: '#60a5fa',
-        opacity: 0.25,
+        color: '#ffffff',
+        opacity: 0.4,
+        width: 1
+      },
+      // Modern tsParticles keys
+      links: {
+        enable: true,
+        distance: 150,
+        color: '#ffffff',
+        opacity: 0.4,
         width: 1
       },
       move: {
         enable: true,
-        speed: 2,
+        speed: 3,
         direction: 'none',
-        random: true,
+        random: false,
         straight: false,
         out_mode: 'out',
         bounce: false,
@@ -68,6 +80,8 @@ const ParticleBackground = () => {
       }
     },
     interactivity: {
+      // detect_on: 'window' listens to viewport-wide events,
+      // allowing repulsion/interactivity even when the canvas is in the background
       detect_on: 'canvas',
       events: {
         onhover: {
@@ -75,7 +89,7 @@ const ParticleBackground = () => {
           mode: 'repulse'
         },
         onclick: {
-          enable: true,
+          enable: false,
           mode: 'push'
         },
         resize: true
@@ -95,7 +109,7 @@ const ParticleBackground = () => {
           speed: 3
         },
         repulse: {
-          distance: 150,
+          distance: 200,
           duration: 0.4
         },
         push: {
