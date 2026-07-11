@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ParticleBackground from './components/ParticleBackground';
+import CustomCursor from './components/CustomCursor';
 
 // Pages
 import Home from './pages/Home';
@@ -16,12 +17,13 @@ import Resume from './pages/Resume';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 
-import './App.css';
-
 function App() {
   return (
     <AuthProvider>
       <Router>
+        {/* Custom cursor dot + ring follow delay */}
+        <CustomCursor />
+
         {/* Interactive Particle Background on every page */}
         <ParticleBackground />
         
@@ -29,7 +31,7 @@ function App() {
         <Navbar />
 
         {/* Main Routing Container */}
-        <main>
+        <main className="pt-10 pb-20 min-h-[calc(100vh-160px)] relative z-1 flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/experience" element={<Experience />} />

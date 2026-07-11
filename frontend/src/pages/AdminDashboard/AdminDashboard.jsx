@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
-import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -340,17 +339,21 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="container dashboard-container">
-      <h1 className="section-title gradient-text text-glow">Admin Dashboard</h1>
+    <div className="max-w-6xl mx-auto px-4 py-16 flex flex-col gap-8 z-10 relative">
+      <h1 className="text-4xl font-extrabold text-center tracking-wide gradient-text text-glow">Admin Dashboard</h1>
 
-      {message && <div className="dashboard-alert glass-panel">{message}</div>}
+      {message && (
+        <div className="bg-accent-blue/10 border border-accent-blue/20 text-accent-blue p-4 rounded-xl font-medium text-center animate-pulse-glow">
+          {message}
+        </div>
+      )}
 
       {/* Tabs Controller */}
-      <div className="dashboard-tabs">
+      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
         {['profile', 'experience', 'projects', 'skills', 'certifications', 'blogs'].map((tab) => (
           <button
             key={tab}
-            className={`glass-button tab-btn ${activeTab === tab ? 'active' : ''}`}
+            className={`glass-button shrink-0 text-sm ${activeTab === tab ? 'active' : ''}`}
             onClick={() => setActiveTab(tab)}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -358,14 +361,14 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      <div className="dashboard-content-panel glass-panel">
+      <div className="glass-panel p-6 sm:p-10 rounded-[24px]">
         {/* Tab 1: Profile */}
         {activeTab === 'profile' && (
-          <form onSubmit={handleProfileSubmit} className="dashboard-form">
-            <h2 className="tab-title gradient-text">Edit Personal Profile</h2>
-            <div className="form-row">
-              <div className="form-group flex-1">
-                <label>Name</label>
+          <form onSubmit={handleProfileSubmit} className="flex flex-col gap-6">
+            <h2 className="text-2xl font-bold gradient-text mb-2">Edit Personal Profile</h2>
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Name</label>
                 <input
                   type="text"
                   className="glass-input"
@@ -374,8 +377,8 @@ const AdminDashboard = () => {
                   required
                 />
               </div>
-              <div className="form-group flex-1">
-                <label>Title</label>
+              <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Title</label>
                 <input
                   type="text"
                   className="glass-input"
@@ -386,10 +389,10 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            <div className="form-group">
-              <label>Bio (About Section)</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-semibold text-text-secondary">Bio (About Section)</label>
               <textarea
-                className="glass-input textarea"
+                className="glass-input resize-vertical"
                 value={profile.bio}
                 onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
                 rows={6}
@@ -397,10 +400,10 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <h3 className="sub-title">Files & Documents</h3>
-            <div className="form-row">
-              <div className="form-group flex-1">
-                <label>Profile Image (About Photo)</label>
+            <h3 className="text-lg font-bold mt-4 border-b border-border-glass pb-2 text-text-primary">Files & Documents</h3>
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Profile Image (About Photo)</label>
                 <input
                   type="file"
                   accept="image/*"
@@ -408,11 +411,13 @@ const AdminDashboard = () => {
                   onChange={(e) => setAboutImageFile(e.target.files[0])}
                 />
                 {profile.aboutImage?.url && (
-                  <span className="file-info-label">Current: <a href={profile.aboutImage.url} target="_blank" rel="noreferrer">View Image</a></span>
+                  <span className="text-xs text-text-secondary mt-1">
+                    Current: <a href={profile.aboutImage.url} target="_blank" rel="noreferrer" className="text-accent-blue cursor-none">View Image</a>
+                  </span>
                 )}
               </div>
-              <div className="form-group flex-1">
-                <label>Resume (PDF File)</label>
+              <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Resume (PDF File)</label>
                 <input
                   type="file"
                   accept="application/pdf"
@@ -420,15 +425,17 @@ const AdminDashboard = () => {
                   onChange={(e) => setResumeFile(e.target.files[0])}
                 />
                 {profile.resumeUrl?.url && (
-                  <span className="file-info-label">Current: <a href={profile.resumeUrl.url} target="_blank" rel="noreferrer">View PDF</a></span>
+                  <span className="text-xs text-text-secondary mt-1">
+                    Current: <a href={profile.resumeUrl.url} target="_blank" rel="noreferrer" className="text-accent-blue cursor-none">View PDF</a>
+                  </span>
                 )}
               </div>
             </div>
 
-            <h3 className="sub-title">Social Links</h3>
-            <div className="form-row">
-              <div className="form-group flex-1">
-                <label>GitHub Link</label>
+            <h3 className="text-lg font-bold mt-4 border-b border-border-glass pb-2 text-text-primary">Social Links</h3>
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">GitHub Link</label>
                 <input
                   type="url"
                   className="glass-input"
@@ -439,8 +446,8 @@ const AdminDashboard = () => {
                   })}
                 />
               </div>
-              <div className="form-group flex-1">
-                <label>LinkedIn Link</label>
+              <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">LinkedIn Link</label>
                 <input
                   type="url"
                   className="glass-input"
@@ -452,9 +459,9 @@ const AdminDashboard = () => {
                 />
               </div>
             </div>
-            <div className="form-row">
-              <div className="form-group flex-1">
-                <label>Twitter Link</label>
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Twitter Link</label>
                 <input
                   type="url"
                   className="glass-input"
@@ -465,8 +472,8 @@ const AdminDashboard = () => {
                   })}
                 />
               </div>
-              <div className="form-group flex-1">
-                <label>Email Address</label>
+              <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Email Address</label>
                 <input
                   type="email"
                   className="glass-input"
@@ -479,7 +486,7 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            <button type="submit" className="glass-button active submit-btn" disabled={loading}>
+            <button type="submit" className="glass-button active w-full mt-4 justify-center" disabled={loading}>
               {loading ? 'Saving...' : 'Save Profile Changes'}
             </button>
           </form>
@@ -487,12 +494,12 @@ const AdminDashboard = () => {
 
         {/* Tab 2: Experience */}
         {activeTab === 'experience' && (
-          <div className="dashboard-grid-container">
-            <form onSubmit={handleExpSubmit} className="dashboard-form">
-              <h2 className="tab-title gradient-text">{expForm.id ? 'Edit' : 'Add'} Experience</h2>
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Company</label>
+          <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10">
+            <form onSubmit={handleExpSubmit} className="flex flex-col gap-6">
+              <h2 className="text-2xl font-bold gradient-text">{expForm.id ? 'Edit' : 'Add'} Experience</h2>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Company</label>
                   <input
                     type="text"
                     className="glass-input"
@@ -501,8 +508,8 @@ const AdminDashboard = () => {
                     required
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Role</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Role</label>
                   <input
                     type="text"
                     className="glass-input"
@@ -512,9 +519,9 @@ const AdminDashboard = () => {
                   />
                 </div>
               </div>
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Location</label>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Location</label>
                   <input
                     type="text"
                     className="glass-input"
@@ -522,8 +529,8 @@ const AdminDashboard = () => {
                     onChange={(e) => setExpForm({ ...expForm, location: e.target.value })}
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Order (Sorting)</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Order (Sorting)</label>
                   <input
                     type="number"
                     className="glass-input"
@@ -532,9 +539,9 @@ const AdminDashboard = () => {
                   />
                 </div>
               </div>
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Start Date</label>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Start Date</label>
                   <input
                     type="date"
                     className="glass-input"
@@ -543,8 +550,8 @@ const AdminDashboard = () => {
                     required
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>End Date</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">End Date</label>
                   <input
                     type="date"
                     className="glass-input"
@@ -554,20 +561,21 @@ const AdminDashboard = () => {
                   />
                 </div>
               </div>
-              <div className="form-checkbox">
+              <div className="flex items-center gap-2.5">
                 <input
                   type="checkbox"
                   id="current"
+                  className="w-[18px] h-[18px] cursor-none"
                   checked={expForm.current}
                   onChange={(e) => setExpForm({ ...expForm, current: e.target.checked })}
                 />
-                <label htmlFor="current">I currently work here</label>
+                <label htmlFor="current" className="text-sm text-text-secondary cursor-none">I currently work here</label>
               </div>
 
-              <div className="form-group">
-                <label>Description (One accomplishment per line)</label>
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Description (One accomplishment per line)</label>
                 <textarea
-                  className="glass-input textarea"
+                  className="glass-input resize-vertical"
                   value={expForm.description}
                   onChange={(e) => setExpForm({ ...expForm, description: e.target.value })}
                   rows={4}
@@ -576,8 +584,8 @@ const AdminDashboard = () => {
                 />
               </div>
 
-              <div className="form-group">
-                <label>Technologies Used (comma separated)</label>
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Technologies Used (comma separated)</label>
                 <input
                   type="text"
                   className="glass-input"
@@ -587,8 +595,8 @@ const AdminDashboard = () => {
                 />
               </div>
 
-              <div className="form-row">
-                <button type="submit" className="glass-button active flex-1" disabled={loading}>
+              <div className="flex gap-4">
+                <button type="submit" className="glass-button active flex-1 justify-center" disabled={loading}>
                   {expForm.id ? 'Update' : 'Add'}
                 </button>
                 {expForm.id && (
@@ -603,20 +611,19 @@ const AdminDashboard = () => {
               </div>
             </form>
 
-            <div className="dashboard-list">
-              <h2 className="tab-title gradient-text">Existing Experiences</h2>
+            <div className="flex flex-col gap-4 max-h-[700px] overflow-y-auto pr-2">
+              <h2 className="text-2xl font-bold gradient-text">Existing Experiences</h2>
               {experiences.map((exp) => (
-                <div key={exp._id} className="list-item glass-panel">
+                <div key={exp._id} className="flex justify-between items-center p-5 gap-4 glass-panel rounded-xl">
                   <div>
-                    <h4>{exp.role} @ {exp.company}</h4>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                    <h4 className="text-base font-semibold text-white">{exp.role} @ {exp.company}</h4>
+                    <p className="text-xs text-text-secondary mt-1">
                       Order: {exp.order} | {exp.current ? 'Current' : 'Past'}
                     </p>
                   </div>
-                  <div className="list-item-actions">
+                  <div className="flex gap-2">
                     <button
-                      className="glass-button"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                      className="glass-button px-3 py-1.5 text-xs cursor-none"
                       onClick={() => setExpForm({
                         id: exp._id,
                         company: exp.company,
@@ -633,8 +640,7 @@ const AdminDashboard = () => {
                       Edit
                     </button>
                     <button
-                      className="glass-button"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--color-accent-pink)', borderColor: 'rgba(255, 45, 85, 0.3)' }}
+                      className="glass-button px-3 py-1.5 text-xs text-accent-pink border-accent-pink/30 hover:bg-accent-pink/10 cursor-none"
                       onClick={() => deleteExperience(exp._id)}
                     >
                       Delete
@@ -648,12 +654,12 @@ const AdminDashboard = () => {
 
         {/* Tab 3: Projects */}
         {activeTab === 'projects' && (
-          <div className="dashboard-grid-container">
-            <form onSubmit={handleProjectSubmit} className="dashboard-form">
-              <h2 className="tab-title gradient-text">{projectForm.id ? 'Edit' : 'Add'} Project</h2>
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Project Title</label>
+          <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10">
+            <form onSubmit={handleProjectSubmit} className="flex flex-col gap-6">
+              <h2 className="text-2xl font-bold gradient-text">{projectForm.id ? 'Edit' : 'Add'} Project</h2>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Project Title</label>
                   <input
                     type="text"
                     className="glass-input"
@@ -662,8 +668,8 @@ const AdminDashboard = () => {
                     required
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Category</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Category</label>
                   <input
                     type="text"
                     className="glass-input"
@@ -675,10 +681,10 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Description</label>
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Description</label>
                 <textarea
-                  className="glass-input textarea"
+                  className="glass-input resize-vertical"
                   value={projectForm.description}
                   onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
                   rows={3}
@@ -686,8 +692,8 @@ const AdminDashboard = () => {
                 />
               </div>
 
-              <div className="form-group">
-                <label>Technologies (comma separated)</label>
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Technologies (comma separated)</label>
                 <input
                   type="text"
                   className="glass-input"
@@ -697,9 +703,9 @@ const AdminDashboard = () => {
                 />
               </div>
 
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>GitHub Link</label>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">GitHub Link</label>
                   <input
                     type="url"
                     className="glass-input"
@@ -707,8 +713,8 @@ const AdminDashboard = () => {
                     onChange={(e) => setProjectForm({ ...projectForm, githubLink: e.target.value })}
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Live Link</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Live Link</label>
                   <input
                     type="url"
                     className="glass-input"
@@ -718,9 +724,9 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Order</label>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Order</label>
                   <input
                     type="number"
                     className="glass-input"
@@ -728,8 +734,8 @@ const AdminDashboard = () => {
                     onChange={(e) => setProjectForm({ ...projectForm, order: Number(e.target.value) })}
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Project Screenshot Image</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Project Screenshot Image</label>
                   <input
                     type="file"
                     accept="image/*"
@@ -739,8 +745,8 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <button type="submit" className="glass-button active flex-1" disabled={loading}>
+              <div className="flex gap-4">
+                <button type="submit" className="glass-button active flex-1 justify-center" disabled={loading}>
                   {projectForm.id ? 'Update' : 'Add'}
                 </button>
                 {projectForm.id && (
@@ -755,20 +761,19 @@ const AdminDashboard = () => {
               </div>
             </form>
 
-            <div className="dashboard-list">
-              <h2 className="tab-title gradient-text">Existing Projects</h2>
+            <div className="flex flex-col gap-4 max-h-[700px] overflow-y-auto pr-2">
+              <h2 className="text-2xl font-bold gradient-text">Existing Projects</h2>
               {projects.map((proj) => (
-                <div key={proj._id} className="list-item glass-panel">
+                <div key={proj._id} className="flex justify-between items-center p-5 gap-4 glass-panel rounded-xl">
                   <div>
-                    <h4>{proj.title}</h4>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                    <h4 className="text-base font-semibold text-white">{proj.title}</h4>
+                    <p className="text-xs text-text-secondary mt-1">
                       Category: {proj.category} | Order: {proj.order}
                     </p>
                   </div>
-                  <div className="list-item-actions">
+                  <div className="flex gap-2">
                     <button
-                      className="glass-button"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                      className="glass-button px-3 py-1.5 text-xs cursor-none"
                       onClick={() => setProjectForm({
                         id: proj._id,
                         title: proj.title,
@@ -783,8 +788,7 @@ const AdminDashboard = () => {
                       Edit
                     </button>
                     <button
-                      className="glass-button"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--color-accent-pink)', borderColor: 'rgba(255, 45, 85, 0.3)' }}
+                      className="glass-button px-3 py-1.5 text-xs text-accent-pink border-accent-pink/30 hover:bg-accent-pink/10 cursor-none"
                       onClick={() => deleteProject(proj._id)}
                     >
                       Delete
@@ -798,12 +802,12 @@ const AdminDashboard = () => {
 
         {/* Tab 4: Skills */}
         {activeTab === 'skills' && (
-          <div className="dashboard-grid-container">
-            <form onSubmit={handleSkillSubmit} className="dashboard-form">
-              <h2 className="tab-title gradient-text">{skillForm.id ? 'Edit' : 'Add'} Skill</h2>
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Skill Name</label>
+          <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10">
+            <form onSubmit={handleSkillSubmit} className="flex flex-col gap-6">
+              <h2 className="text-2xl font-bold gradient-text">{skillForm.id ? 'Edit' : 'Add'} Skill</h2>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Skill Name</label>
                   <input
                     type="text"
                     className="glass-input"
@@ -812,10 +816,10 @@ const AdminDashboard = () => {
                     required
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Category</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Category</label>
                   <select
-                    className="glass-input"
+                    className="glass-input cursor-none"
                     value={skillForm.category}
                     onChange={(e) => setSkillForm({ ...skillForm, category: e.target.value })}
                   >
@@ -828,9 +832,9 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Level (Proficiency %)</label>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Level (Proficiency %)</label>
                   <input
                     type="number"
                     min="0"
@@ -841,8 +845,8 @@ const AdminDashboard = () => {
                     required
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Skill Icon Image</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Skill Icon Image</label>
                   <input
                     type="file"
                     accept="image/*"
@@ -852,8 +856,8 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <button type="submit" className="glass-button active flex-1" disabled={loading}>
+              <div className="flex gap-4">
+                <button type="submit" className="glass-button active flex-1 justify-center" disabled={loading}>
                   {skillForm.id ? 'Update' : 'Add'}
                 </button>
                 {skillForm.id && (
@@ -868,20 +872,19 @@ const AdminDashboard = () => {
               </div>
             </form>
 
-            <div className="dashboard-list">
-              <h2 className="tab-title gradient-text">Existing Skills</h2>
+            <div className="flex flex-col gap-4 max-h-[700px] overflow-y-auto pr-2">
+              <h2 className="text-2xl font-bold gradient-text">Existing Skills</h2>
               {skills.map((skill) => (
-                <div key={skill._id} className="list-item glass-panel">
+                <div key={skill._id} className="flex justify-between items-center p-5 gap-4 glass-panel rounded-xl">
                   <div>
-                    <h4>{skill.name}</h4>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                    <h4 className="text-base font-semibold text-white">{skill.name}</h4>
+                    <p className="text-xs text-text-secondary mt-1">
                       Category: {skill.category} | Proficiency: {skill.level}%
                     </p>
                   </div>
-                  <div className="list-item-actions">
+                  <div className="flex gap-2">
                     <button
-                      className="glass-button"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                      className="glass-button px-3 py-1.5 text-xs cursor-none"
                       onClick={() => setSkillForm({
                         id: skill._id,
                         name: skill.name,
@@ -892,8 +895,7 @@ const AdminDashboard = () => {
                       Edit
                     </button>
                     <button
-                      className="glass-button"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--color-accent-pink)', borderColor: 'rgba(255, 45, 85, 0.3)' }}
+                      className="glass-button px-3 py-1.5 text-xs text-accent-pink border-accent-pink/30 hover:bg-accent-pink/10 cursor-none"
                       onClick={() => deleteSkill(skill._id)}
                     >
                       Delete
@@ -907,12 +909,12 @@ const AdminDashboard = () => {
 
         {/* Tab 5: Certifications */}
         {activeTab === 'certifications' && (
-          <div className="dashboard-grid-container">
-            <form onSubmit={handleCertSubmit} className="dashboard-form">
-              <h2 className="tab-title gradient-text">{certForm.id ? 'Edit' : 'Add'} Certification</h2>
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Certification Name</label>
+          <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10">
+            <form onSubmit={handleCertSubmit} className="flex flex-col gap-6">
+              <h2 className="text-2xl font-bold gradient-text">{certForm.id ? 'Edit' : 'Add'} Certification</h2>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Certification Name</label>
                   <input
                     type="text"
                     className="glass-input"
@@ -921,8 +923,8 @@ const AdminDashboard = () => {
                     required
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Issuing Organization</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Issuing Organization</label>
                   <input
                     type="text"
                     className="glass-input"
@@ -933,9 +935,9 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Issue Date</label>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Issue Date</label>
                   <input
                     type="date"
                     className="glass-input"
@@ -944,8 +946,8 @@ const AdminDashboard = () => {
                     required
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Order</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Order</label>
                   <input
                     type="number"
                     className="glass-input"
@@ -955,9 +957,9 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Credential Verification URL</label>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Credential Verification URL</label>
                   <input
                     type="url"
                     className="glass-input"
@@ -965,8 +967,8 @@ const AdminDashboard = () => {
                     onChange={(e) => setCertForm({ ...certForm, credentialUrl: e.target.value })}
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Certificate File (Image or PDF)</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Certificate File (Image or PDF)</label>
                   <input
                     type="file"
                     accept="image/*,application/pdf"
@@ -976,8 +978,8 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <button type="submit" className="glass-button active flex-1" disabled={loading}>
+              <div className="flex gap-4">
+                <button type="submit" className="glass-button active flex-1 justify-center" disabled={loading}>
                   {certForm.id ? 'Update' : 'Add'}
                 </button>
                 {certForm.id && (
@@ -992,20 +994,19 @@ const AdminDashboard = () => {
               </div>
             </form>
 
-            <div className="dashboard-list">
-              <h2 className="tab-title gradient-text">Existing Certifications</h2>
+            <div className="flex flex-col gap-4 max-h-[700px] overflow-y-auto pr-2">
+              <h2 className="text-2xl font-bold gradient-text">Existing Certifications</h2>
               {certifications.map((cert) => (
-                <div key={cert._id} className="list-item glass-panel">
+                <div key={cert._id} className="flex justify-between items-center p-5 gap-4 glass-panel rounded-xl">
                   <div>
-                    <h4>{cert.name}</h4>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                    <h4 className="text-base font-semibold text-white">{cert.name}</h4>
+                    <p className="text-xs text-text-secondary mt-1">
                       Org: {cert.issuingOrganization} | Order: {cert.order}
                     </p>
                   </div>
-                  <div className="list-item-actions">
+                  <div className="flex gap-2">
                     <button
-                      className="glass-button"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                      className="glass-button px-3 py-1.5 text-xs cursor-none"
                       onClick={() => setCertForm({
                         id: cert._id,
                         name: cert.name,
@@ -1018,8 +1019,7 @@ const AdminDashboard = () => {
                       Edit
                     </button>
                     <button
-                      className="glass-button"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--color-accent-pink)', borderColor: 'rgba(255, 45, 85, 0.3)' }}
+                      className="glass-button px-3 py-1.5 text-xs text-accent-pink border-accent-pink/30 hover:bg-accent-pink/10 cursor-none"
                       onClick={() => deleteCert(cert._id)}
                     >
                       Delete
@@ -1033,12 +1033,12 @@ const AdminDashboard = () => {
 
         {/* Tab 6: Blogs */}
         {activeTab === 'blogs' && (
-          <div className="dashboard-grid-container">
-            <form onSubmit={handleBlogSubmit} className="dashboard-form">
-              <h2 className="tab-title gradient-text">{blogForm.id ? 'Edit' : 'Add'} Blog Post</h2>
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Title</label>
+          <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10">
+            <form onSubmit={handleBlogSubmit} className="flex flex-col gap-6">
+              <h2 className="text-2xl font-bold gradient-text">{blogForm.id ? 'Edit' : 'Add'} Blog Post</h2>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Title</label>
                   <input
                     type="text"
                     className="glass-input"
@@ -1047,10 +1047,10 @@ const AdminDashboard = () => {
                     required
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Publish Status</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Publish Status</label>
                   <select
-                    className="glass-input"
+                    className="glass-input cursor-none"
                     value={blogForm.status}
                     onChange={(e) => setBlogForm({ ...blogForm, status: e.target.value })}
                   >
@@ -1060,10 +1060,10 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Blog Content (Text/Markdown)</label>
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Blog Content (Text/Markdown)</label>
                 <textarea
-                  className="glass-input textarea"
+                  className="glass-input resize-vertical"
                   value={blogForm.content}
                   onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
                   rows={8}
@@ -1071,9 +1071,9 @@ const AdminDashboard = () => {
                 />
               </div>
 
-              <div className="form-row">
-                <div className="form-group flex-1">
-                  <label>Tags (comma separated)</label>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Tags (comma separated)</label>
                   <input
                     type="text"
                     className="glass-input"
@@ -1082,8 +1082,8 @@ const AdminDashboard = () => {
                     placeholder="React, CSS, Coding"
                   />
                 </div>
-                <div className="form-group flex-1">
-                  <label>Featured Image</label>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Featured Image</label>
                   <input
                     type="file"
                     accept="image/*"
@@ -1093,8 +1093,8 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <button type="submit" className="glass-button active flex-1" disabled={loading}>
+              <div className="flex gap-4">
+                <button type="submit" className="glass-button active flex-1 justify-center" disabled={loading}>
                   {blogForm.id ? 'Update' : 'Add'}
                 </button>
                 {blogForm.id && (
@@ -1109,20 +1109,19 @@ const AdminDashboard = () => {
               </div>
             </form>
 
-            <div className="dashboard-list">
-              <h2 className="tab-title gradient-text">Existing Blogs</h2>
+            <div className="flex flex-col gap-4 max-h-[700px] overflow-y-auto pr-2">
+              <h2 className="text-2xl font-bold gradient-text">Existing Blogs</h2>
               {blogs.map((blog) => (
-                <div key={blog._id} className="list-item glass-panel">
+                <div key={blog._id} className="flex justify-between items-center p-5 gap-4 glass-panel rounded-xl">
                   <div>
-                    <h4>{blog.title}</h4>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
-                      Status: <span style={{ color: blog.status === 'published' ? 'var(--color-accent-blue)' : 'var(--color-accent-pink)' }}>{blog.status}</span>
+                    <h4 className="text-base font-semibold text-white">{blog.title}</h4>
+                    <p className="text-xs text-text-secondary mt-1">
+                      Status: <span className={blog.status === 'published' ? 'text-accent-blue' : 'text-accent-pink'}>{blog.status}</span>
                     </p>
                   </div>
-                  <div className="list-item-actions">
+                  <div className="flex gap-2">
                     <button
-                      className="glass-button"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                      className="glass-button px-3 py-1.5 text-xs cursor-none"
                       onClick={() => setBlogForm({
                         id: blog._id,
                         title: blog.title,
@@ -1134,8 +1133,7 @@ const AdminDashboard = () => {
                       Edit
                     </button>
                     <button
-                      className="glass-button"
-                      style={{ padding: '6px 12px', fontSize: '0.8rem', color: 'var(--color-accent-pink)', borderColor: 'rgba(255, 45, 85, 0.3)' }}
+                      className="glass-button px-3 py-1.5 text-xs text-accent-pink border-accent-pink/30 hover:bg-accent-pink/10 cursor-none"
                       onClick={() => deleteBlog(blog._id)}
                     >
                       Delete

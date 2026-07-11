@@ -1,140 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
 
-:root {
-  --bg-primary: #030616;
-  --bg-card: rgba(10, 15, 30, 0.6);
-  --bg-glass: rgba(255, 255, 255, 0.03);
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-glow: rgba(0, 240, 255, 0.2);
-  
-  --color-text-primary: #f3f4f6;
-  --color-text-secondary: #9ca3af;
+@theme {
+  --color-bg-primary: #030616;
+  --color-bg-card: rgba(10, 15, 30, 0.6);
+  --color-border-glass: rgba(255, 255, 255, 0.08);
   --color-accent-blue: #00f0ff;
   --color-accent-purple: #a855f7;
   --color-accent-pink: #ff2d55;
-  
-  --font-main: 'Outfit', sans-serif;
-  --shadow-neon: 0 0 15px rgba(0, 240, 255, 0.15);
-  --shadow-neon-hover: 0 0 25px rgba(0, 240, 255, 0.35);
-  
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #9ca3af;
+
+  --font-sans: 'Outfit', sans-serif;
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 2s infinite ease-in-out;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-accent-blue) var(--bg-primary);
-}
-
-/* Scrollbar Customization */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 240, 255, 0.3);
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent-blue);
-}
-
-body {
-  font-family: var(--font-main);
-  background-color: var(--bg-primary);
-  color: var(--color-text-primary);
-  overflow-x: hidden;
-  line-height: 1.6;
-  min-height: 100vh;
-}
-
-#root {
-  min-height: 100vh;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Glassmorphism Classes */
-.glass-panel {
-  background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  transition: var(--transition-smooth);
-}
-
-.glass-panel:hover {
-  border-color: rgba(0, 240, 255, 0.3);
-  box-shadow: var(--shadow-neon);
-}
-
-.glass-button {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-glass);
-  color: var(--color-text-primary);
-  padding: 10px 24px;
-  font-size: 1rem;
-  font-weight: 500;
-  border-radius: 30px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  transition: var(--transition-smooth);
-}
-
-.glass-button:hover {
-  background: rgba(0, 240, 255, 0.1);
-  border-color: var(--color-accent-blue);
-  box-shadow: var(--shadow-neon);
-  transform: translateY(-2px);
-}
-
-.glass-button.active {
-  background: linear-gradient(135deg, var(--color-accent-blue), var(--color-accent-purple));
-  border-color: transparent;
-  box-shadow: var(--shadow-neon);
-}
-
-.glass-input {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-glass);
-  border-radius: 8px;
-  padding: 12px 16px;
-  color: var(--color-text-primary);
-  font-family: var(--font-main);
-  outline: none;
-  transition: var(--transition-smooth);
-  width: 100%;
-}
-
-.glass-input:focus {
-  border-color: var(--color-accent-blue);
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
-}
-
-/* Neon Text Glow */
-.text-glow {
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, var(--color-accent-blue) 0%, var(--color-accent-purple) 50%, var(--color-accent-pink) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Keyframes */
 @keyframes float {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
@@ -146,28 +27,27 @@ body {
   50% { opacity: 1; }
 }
 
-.floating {
-  animation: float 4s ease-in-out infinite;
+/* Custom Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent-blue) var(--color-bg-primary);
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-blue);
 }
 
-/* Global Layout Utilities */
-.container {
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 80px 0;
-  z-index: 1;
-}
-
-.section-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 50px;
-  text-align: center;
-  letter-spacing: 1px;
-}
-
-/* Particles Wrapper */
+/* Particles Canvas */
 #tsparticles {
   position: fixed;
   top: 0;
@@ -175,12 +55,88 @@ body {
   width: 100%;
   height: 100%;
   z-index: 0;
-  pointer-events: none; /* Avoid blocking clicks, window detection handles hover */
+  pointer-events: none;
 }
 
-/* Flex Pages wrapper to place content above canvas */
-main {
-  position: relative;
-  z-index: 1;
-  flex: 1;
+/* Custom Cursor Hide Default */
+html,
+body, 
+a, 
+button, 
+input, 
+textarea, 
+select {
+  cursor: none !important;
+}
+
+/* Custom Utilities for Glassmorphism & Neon */
+@utility glass-panel {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-glass);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    border-color: rgba(0, 240, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+  }
+}
+
+@utility glass-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border-glass);
+  color: var(--color-text-primary);
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 30px;
+  cursor: none !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: rgba(0, 240, 255, 0.1);
+    border-color: var(--color-accent-blue);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+    transform: translateY(-2px);
+  }
+}
+
+@utility glass-button-active {
+  background: linear-gradient(135deg, var(--color-accent-blue), var(--color-accent-purple));
+  border-color: transparent;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+@utility glass-input {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border-glass);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+
+  &:focus {
+    border-color: var(--color-accent-blue);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+  }
+}
+
+@utility text-glow {
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+@utility gradient-text {
+  background: linear-gradient(135deg, var(--color-accent-blue) 0%, var(--color-accent-purple) 50%, var(--color-accent-pink) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './Login.css';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -31,15 +30,19 @@ const Login = () => {
   };
 
   return (
-    <div className="login-page-container">
-      <div className="login-card glass-panel">
-        <h2 className="login-title gradient-text text-glow">Admin Portal</h2>
+    <div className="flex justify-center items-center min-h-[70vh] px-4 py-10">
+      <div className="w-full max-w-md p-10 glass-panel rounded-[24px]">
+        <h2 className="text-center text-3xl font-extrabold mb-8 gradient-text text-glow">Admin Portal</h2>
         
-        {error && <div className="login-error-msg">{error}</div>}
+        {error && (
+          <div className="bg-accent-pink/10 border border-accent-pink/20 text-accent-pink p-3 rounded-lg text-sm text-center mb-6 text-glow">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="username" className="text-xs font-semibold text-text-secondary">Username</label>
             <input
               type="text"
               id="username"
@@ -51,8 +54,8 @@ const Login = () => {
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password" className="text-xs font-semibold text-text-secondary">Password</label>
             <input
               type="password"
               id="password"
@@ -66,7 +69,7 @@ const Login = () => {
 
           <button 
             type="submit" 
-            className="glass-button active submit-btn" 
+            className="glass-button active w-full mt-2.5 justify-center text-base" 
             disabled={submitting}
           >
             {submitting ? 'Authenticating...' : 'Sign In'}

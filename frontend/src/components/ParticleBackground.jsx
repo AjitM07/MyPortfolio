@@ -43,7 +43,7 @@ const ParticleBackground = () => {
         random: true,
         anim: {
           enable: false,
-          speed: 10,
+          speed: 50,
           size_min: 0.1,
           sync: false
         }
@@ -80,16 +80,14 @@ const ParticleBackground = () => {
       }
     },
     interactivity: {
-      // detect_on: 'window' listens to viewport-wide events,
-      // allowing repulsion/interactivity even when the canvas is in the background
-      detect_on: 'canvas',
+      detectsOn: 'window',
       events: {
-        onhover: {
+        onHover: {
           enable: true,
           mode: 'repulse'
         },
-        onclick: {
-          enable: false,
+        onClick: {
+          enable: true,
           mode: 'push'
         },
         resize: true

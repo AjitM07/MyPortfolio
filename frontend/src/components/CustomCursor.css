@@ -1,0 +1,82 @@
+/* Custom Cursor CSS */
+
+/* Hide default cursor on the whole viewport and interactive elements */
+html,
+body, 
+a, 
+button, 
+input, 
+textarea, 
+select, 
+.glass-button, 
+.nav-item {
+  cursor: none !important;
+}
+
+/* Custom Cursor Elements */
+.custom-cursor-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-accent-blue);
+  border-radius: 50%;
+  position: fixed;
+  top: -3px; /* Center alignment offset */
+  left: -3px;
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: 0 0 10px var(--color-accent-blue);
+  will-change: transform;
+}
+
+.custom-cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid var(--color-accent-blue);
+  border-radius: 50%;
+  position: fixed;
+  top: -18px; /* Center alignment offset */
+  left: -18px;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.7;
+  will-change: transform;
+  transition: width 0.2s, height 0.2s, border-color 0.2s, top 0.2s, left 0.2s, opacity 0.2s;
+}
+
+/* Hover effects */
+.custom-cursor-dot.hovered {
+  background-color: var(--color-accent-purple);
+  width: 4px;
+  height: 4px;
+  top: -2px;
+  left: -2px;
+}
+
+.custom-cursor-ring.hovered {
+  width: 50px;
+  height: 50px;
+  top: -25px;
+  left: -25px;
+  border-color: var(--color-accent-purple);
+  background-color: rgba(168, 85, 247, 0.05);
+  opacity: 1;
+}
+
+/* Hide custom cursor on mobile devices */
+@media (max-width: 900px) {
+  .custom-cursor-dot,
+  .custom-cursor-ring {
+    display: none;
+  }
+  html,
+  body, 
+  a, 
+  button, 
+  input, 
+  textarea, 
+  select, 
+  .glass-button, 
+  .nav-item {
+    cursor: auto !important;
+  }
+}
