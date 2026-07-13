@@ -19,7 +19,7 @@ const AdminDashboard = () => {
 
   // Forms states
   const [expForm, setExpForm] = useState({ id: '', company: '', role: '', location: '', startDate: '', endDate: '', current: false, description: '', technologies: '', order: 0 });
-  const [projectForm, setProjectForm] = useState({ id: '', title: '', description: '', technologies: '', githubLink: '', liveLink: '', category: 'Web Development', order: 0 });
+  const [projectForm, setProjectForm] = useState({ id: '', title: '', subtitle: '', description: '', technologies: '', githubLink: '', liveLink: '', category: 'Web Development', order: 0 });
   const [projectFile, setProjectFile] = useState(null);
   const [skillForm, setSkillForm] = useState({ id: '', name: '', category: 'Frontend', level: 80 });
   const [skillFile, setSkillFile] = useState(null);
@@ -178,6 +178,7 @@ const AdminDashboard = () => {
     try {
       const fd = new FormData();
       fd.append('title', projectForm.title);
+      fd.append('subtitle', projectForm.subtitle || '');
       fd.append('description', projectForm.description);
       fd.append('technologies', projectForm.technologies);
       fd.append('githubLink', projectForm.githubLink || '');
@@ -194,7 +195,7 @@ const AdminDashboard = () => {
         await api.post('/projects', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         showMessage('Project added!');
       }
-      setProjectForm({ id: '', title: '', description: '', technologies: '', githubLink: '', liveLink: '', category: 'Web Development', order: 0 });
+      setProjectForm({ id: '', title: '', subtitle: '', description: '', technologies: '', githubLink: '', liveLink: '', category: 'Web Development', order: 0 });
       setProjectFile(null);
       fetchProjects();
     } catch (err) {
@@ -695,6 +696,17 @@ const AdminDashboard = () => {
               </div>
 
               <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-text-secondary">Project Subtitle (e.g. Full-Stack Government Web Application)</label>
+                <input
+                  type="text"
+                  className="glass-input"
+                  value={projectForm.subtitle || ''}
+                  onChange={(e) => setProjectForm({ ...projectForm, subtitle: e.target.value })}
+                  placeholder="e.g. Machine Learning + Streamlit Application"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
                 <label className="text-xs font-semibold text-text-secondary">Description</label>
                 <textarea
                   className="glass-input resize-vertical"
@@ -766,7 +778,7 @@ const AdminDashboard = () => {
                   <button
                     type="button"
                     className="glass-button"
-                    onClick={() => setProjectForm({ id: '', title: '', description: '', technologies: '', githubLink: '', liveLink: '', category: 'Web Development', order: 0 })}
+                    onClick={() => setProjectForm({ id: '', title: '', subtitle: '', description: '', technologies: '', githubLink: '', liveLink: '', category: 'Web Development', order: 0 })}
                   >
                     Cancel
                   </button>
@@ -790,6 +802,7 @@ const AdminDashboard = () => {
                       onClick={() => setProjectForm({
                         id: proj._id,
                         title: proj.title,
+                        subtitle: proj.subtitle || '',
                         description: proj.description,
                         technologies: proj.technologies.join(', '),
                         githubLink: proj.githubLink,

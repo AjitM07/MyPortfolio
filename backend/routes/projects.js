@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 // @access  Private
 router.post('/', protect, upload.single('image'), async (req, res) => {
   try {
-    const { title, description, technologies, githubLink, liveLink, category, order } = req.body;
+    const { title, subtitle, description, technologies, githubLink, liveLink, category, order } = req.body;
 
     if (!title || !description) {
       return res.status(400).json({ message: 'Title and description are required' });
@@ -45,6 +45,7 @@ router.post('/', protect, upload.single('image'), async (req, res) => {
 
     const project = await Project.create({
       title,
+      subtitle: subtitle || '',
       description,
       technologies: parsedTechnologies,
       githubLink: githubLink || '',
@@ -65,7 +66,7 @@ router.post('/', protect, upload.single('image'), async (req, res) => {
 // @access  Private
 router.put('/:id', protect, upload.single('image'), async (req, res) => {
   try {
-    const { title, description, technologies, githubLink, liveLink, category, order } = req.body;
+    const { title, subtitle, description, technologies, githubLink, liveLink, category, order } = req.body;
     const project = await Project.findById(req.params.id);
 
     if (!project) {
@@ -73,6 +74,7 @@ router.put('/:id', protect, upload.single('image'), async (req, res) => {
     }
 
     if (title) project.title = title;
+    if (subtitle !== undefined) project.subtitle = subtitle;
     if (description) project.description = description;
     if (githubLink !== undefined) project.githubLink = githubLink;
     if (liveLink !== undefined) project.liveLink = liveLink;
