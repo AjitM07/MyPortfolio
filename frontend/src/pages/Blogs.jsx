@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import api from '../utils/api';
 
 const Blogs = () => {
@@ -49,8 +50,9 @@ const Blogs = () => {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10">
         <div className="mb-8">
-          <Link to="/blogs" className="glass-button">
-            &larr; Back to Blogs
+          <Link to="/blogs" className="glass-button inline-flex items-center gap-1.5">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Blogs
           </Link>
         </div>
         <article className="glass-panel p-6 sm:p-10 rounded-[24px]">

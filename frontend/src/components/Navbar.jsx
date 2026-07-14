@@ -34,6 +34,9 @@ const Navbar = () => {
           <NavLink to="/" end className={navItemClass}>
             Home
           </NavLink>
+          <NavLink to="/resume" className={navItemClass}>
+            Resume
+          </NavLink>
           <NavLink to="/experience" className={navItemClass}>
             Experience
           </NavLink>
@@ -49,23 +52,20 @@ const Navbar = () => {
           <NavLink to="/blogs" className={navItemClass}>
             Blogs
           </NavLink>
-          <NavLink to="/resume" className={navItemClass}>
-            Resume
-          </NavLink>
         </div>
 
         {/* Right: Admin controls (Desktop only) */}
         <div className="hidden md:flex items-center justify-end gap-4 shrink-0">
           {admin ? (
             <>
-              <NavLink 
-                to="/admin" 
+              <NavLink
+                to="/admin"
                 className={({ isActive }) => `inline-flex items-center justify-center w-9 h-9 border border-white/10 rounded-lg text-[#c8c3bb] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none ${isActive ? 'text-white border-white/25 bg-white/5' : ''}`}
                 title="Admin Dashboard"
               >
                 <LayoutDashboard className="w-[18px] h-[18px]" />
               </NavLink>
-              <button 
+              <button
                 className="inline-flex items-center justify-center w-9 h-9 border border-white/10 rounded-lg text-[#6b7280] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none"
                 onClick={handleLogout}
                 title="Logout"
@@ -74,8 +74,8 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className="inline-flex items-center justify-center w-9 h-9 border border-white/10 rounded-lg text-[#6b7280] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none"
               title="Admin Login"
             >
@@ -125,15 +125,15 @@ const Navbar = () => {
           <div className="flex gap-4 items-center">
             {admin ? (
               <>
-                <NavLink 
-                  to="/admin" 
+                <NavLink
+                  to="/admin"
                   className={({ isActive }) => `inline-flex items-center justify-center w-11 h-11 border border-white/10 rounded-lg text-[#c8c3bb] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none ${isActive ? 'text-white border-white/25 bg-white/5' : ''}`}
                   onClick={() => setIsOpen(false)}
                   title="Admin Dashboard"
                 >
                   <LayoutDashboard className="w-[20px] h-[20px]" />
                 </NavLink>
-                <button 
+                <button
                   className="inline-flex items-center justify-center w-11 h-11 border border-white/10 rounded-lg text-[#6b7280] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none"
                   onClick={handleLogout}
                   title="Logout"
@@ -142,8 +142,8 @@ const Navbar = () => {
                 </button>
               </>
             ) : (
-              <Link 
-                to="/login" 
+              <Link
+                to="/login"
                 className="inline-flex items-center justify-center w-11 h-11 border border-white/10 rounded-lg text-[#6b7280] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none"
                 onClick={() => setIsOpen(false)}
                 title="Admin Login"

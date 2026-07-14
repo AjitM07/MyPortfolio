@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { marked } from 'marked';
+import { ArrowLeft, AlertCircle, ExternalLink } from 'lucide-react';
 import api from '../utils/api';
 
 // Helper to extract owner and repo name from GitHub URL
@@ -108,10 +109,7 @@ const ProjectReadme = () => {
           to="/projects"
           className="inline-flex items-center gap-2 px-4 py-2 border border-white/10 hover:border-white/20 hover:bg-white/5 text-white font-medium text-sm rounded-lg transition-all duration-200 cursor-none"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <line x1="19" y1="12" x2="5" y2="12" />
-            <polyline points="12 19 5 12 12 5" />
-          </svg>
+          <ArrowLeft className="w-4 h-4" />
           Back to Projects
         </Link>
       </div>
@@ -130,11 +128,7 @@ const ProjectReadme = () => {
 
       {error ? (
         <div className="glass-panel p-8 text-center rounded-2xl border border-red-500/20 bg-red-950/10">
-          <svg className="w-12 h-12 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
+          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">Failed to Load README</h3>
           <p className="text-neutral-400 text-sm mb-6 max-w-md mx-auto">{error}</p>
           {project?.githubLink && (
@@ -145,11 +139,7 @@ const ProjectReadme = () => {
               className="inline-flex items-center gap-2 bg-accent hover:bg-white text-bg-primary font-semibold text-sm px-5 py-2.5 rounded-lg transition-all duration-200 cursor-none"
             >
               View on GitHub
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
+              <ExternalLink className="w-4 h-4" />
             </a>
           )}
         </div>

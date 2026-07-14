@@ -4,19 +4,17 @@ import api from '../utils/api';
 const TimelineItem = ({ exp, index, formatDate }) => {
   const itemRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isReached, setIsReached] = useState(false);
 
   useEffect(() => {
     const currentRef = itemRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
+        setIsVisible(entry.isIntersecting);
       },
       {
         threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px',
+        rootMargin: '0px 0px -80px 0px',
       }
     );
 
@@ -31,17 +29,47 @@ const TimelineItem = ({ exp, index, formatDate }) => {
     };
   }, []);
 
+  // Update reached state relative to scroll line trigger point
+  useEffect(() => {
+    const checkScrollReached = () => {
+      if (!itemRef.current) return;
+      const rect = itemRef.current.getBoundingClientRect();
+      const triggerPoint = window.innerHeight * 0.6; // Matches triggerPoint in parent handleScroll
+      
+      // Dot center is around top + 30px
+      const bulletTop = rect.top + 30;
+      setIsReached(bulletTop <= triggerPoint);
+    };
+
+    window.addEventListener('scroll', checkScrollReached);
+    window.addEventListener('resize', checkScrollReached);
+    
+    // Initial checks
+    checkScrollReached();
+    const timer = setTimeout(checkScrollReached, 100);
+
+    return () => {
+      window.removeEventListener('scroll', checkScrollReached);
+      window.removeEventListener('resize', checkScrollReached);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const cardTransitionClasses = isVisible
+    ? 'opacity-100 translate-x-0 scale-100 border-border-medium'
+    : `opacity-0 -translate-x-8 ${
+        index % 2 === 0 ? 'md:translate-x-12' : 'md:-translate-x-12'
+      } scale-[0.96] border-border-subtle`;
+
   return (
     <div
       ref={itemRef}
-      className={`relative w-full flex flex-col md:flex-row my-8 pl-16 md:pl-0 transition-all duration-700 ease-out transform ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
+      className="relative w-full flex flex-col md:flex-row my-8 pl-16 md:pl-0"
     >
       {/* Timeline Bullet Dot */}
       <div
         className={`absolute w-5 h-5 bg-bg-primary rounded-full z-10 top-[30px] left-[23px] md:left-1/2 md:-translate-x-1/2 border-[3px] transition-all duration-500 ${
-          isVisible
+          isReached
             ? 'border-accent shadow-[0_0_12px_rgba(232,227,217,0.8)] scale-110'
             : 'border-border-medium scale-90'
         }`}
@@ -49,22 +77,22 @@ const TimelineItem = ({ exp, index, formatDate }) => {
 
       {/* Timeline Content Card */}
       <div
-        className={`w-full md:w-[45%] glass-panel p-8 relative transition-all duration-500 ${
+        className={`w-full md:w-[45%] glass-panel p-5 md:p-8 relative transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu will-change-transform ${
           index % 2 === 0 ? 'md:mr-auto' : 'md:ml-auto'
-        } ${isVisible ? 'border-border-medium' : 'border-border-subtle'}`}
+        } ${cardTransitionClasses}`}
       >
-        <div className="text-md font-semibold text-accent mb-2 opacity-80">
+        <div className="text-sm md:text-md font-semibold text-accent mb-2 opacity-80">
           {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
         </div>
-        <h3 className="text-2xl font-bold text-white mb-1">{exp.role}</h3>
-        <h4 className="text-md font-semibold text-accent mb-4">
+        <h3 className="text-xl md:text-2xl font-bold text-white mb-1">{exp.role}</h3>
+        <h4 className="text-sm md:text-md font-semibold text-accent mb-4">
           {exp.company} {exp.location && `| ${exp.location}`}
         </h4>
         <ul className="list-none flex flex-col gap-2 mb-5">
           {exp.description.map((bullet, bIdx) => (
             <li
               key={bIdx}
-              className="relative pl-5 text-text-secondary text-md after:content-['✦'] after:absolute after:left-0 after:text-accent after:text-xs after:top-0"
+              className="relative pl-5 text-text-secondary text-sm md:text-md after:content-['✦'] after:absolute after:left-0 after:text-accent after:text-xs after:top-0"
             >
               {bullet}
             </li>
@@ -75,7 +103,7 @@ const TimelineItem = ({ exp, index, formatDate }) => {
             {exp.technologies.map((tech, tIdx) => (
               <span
                 key={tIdx}
-                className="text-sm font-semibold text-accent bg-accent/8 border border-accent/15 px-4 py-1.5 rounded-full"
+                className="text-xs md:text-sm font-semibold text-accent bg-accent/8 border border-accent/15 px-2.5 py-1 md:px-4 md:py-1.5 rounded-full"
               >
                 {tech}
               </span>
@@ -158,7 +186,7 @@ const Experience = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-16 z-10 relative">
-      <h1 className="text-4xl font-extrabold text-center mb-16 tracking-wide gradient-text text-glow">
+      <h1 className="text-4xl font-extrabold text-center mb-16 tracking-wide gradient-text text-glow animate-fade-in-up">
         Professional Journey
       </h1>
 
