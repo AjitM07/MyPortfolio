@@ -28,15 +28,16 @@ const Home = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 h-[calc(100vh-160px)] max-h-[calc(100vh-160px)] overflow-hidden flex flex-col md:flex-row justify-center items-center md:items-end gap-5 md:gap-12 z-10 relative">
+    <div className="max-w-7xl mx-auto px-6 h-[calc(100vh-155px)] max-h-[calc(100vh-160px)] overflow-hidden flex flex-col md:flex-row justify-center items-center md:items-end gap-5 md:gap-12 z-10 relative">
 
       {/* Left Column: Portrait Image sticking to bottom */}
-      <div className="relative flex-shrink-0 flex items-end justify-center h-[45vh] md:h-full max-h-[70vh] md:max-h-[calc(100vh-160px)] self-end md:-translate-x-0">
+      <div className="relative flex-shrink-0 flex items-end justify-center h-[45vh] md:h-full max-h-[70vh] md:max-h-[calc(100vh-170px)] self-end md:-translate-x-0">
         {profile?.aboutImage?.url ? (
           <img
             src={profile.aboutImage.url}
             alt={profile.name || "Ajit Mangsulikar"}
-            className="h-full w-auto object-contain object-bottom drop-shadow-[0_0_30px_rgba(220,172,126,0.18)] block"
+            className="h-full w-auto object-contain object-bottom block"
+            style={{ filter: 'drop-shadow(0 0 30px rgba(220,172,126,0.18)) drop-shadow(0 15px 20px rgba(0,0,0,0.8))' }}
           />
         ) : (
           <div className="w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] relative flex flex-col items-center justify-center text-text-secondary text-center p-8">
