@@ -31,7 +31,7 @@ const Home = () => {
     <div className="max-w-7xl mx-auto px-6 h-[calc(100vh-160px)] max-h-[calc(100vh-160px)] overflow-hidden flex flex-col md:flex-row justify-center items-center md:items-end gap-5 md:gap-12 z-10 relative">
 
       {/* Left Column: Portrait Image sticking to bottom */}
-      <div className="relative flex-shrink-0 flex items-end justify-center h-[45vh] md:h-full max-h-[70vh] md:max-h-[calc(100vh-160px)] self-end md:-translate-x-15">
+      <div className="relative flex-shrink-0 flex items-end justify-center h-[45vh] md:h-full max-h-[70vh] md:max-h-[calc(100vh-160px)] self-end md:-translate-x-0">
         {profile?.aboutImage?.url ? (
           <img
             src={profile.aboutImage.url}
@@ -40,13 +40,13 @@ const Home = () => {
           />
         ) : (
           <div className="w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] relative flex flex-col items-center justify-center text-text-secondary text-center p-8">
-            <span className="italic text-sm">Upload portrait photo in dashboard</span>
+            <span className="italic text-sm">No Photo</span>
           </div>
         )}
       </div>
 
       {/* Right Column: Hero Text Content centered vertically on desktop */}
-      <div className="flex flex-col items-start gap-4 text-left max-w-xl md:my-auto pb-12 md:pb-0 md:-translate-x-40">
+      <div className="flex flex-col items-start gap-4 text-left max-w-xl md:my-auto pb-12 md:pb-0 md:-translate-x-30">
         <div className="font-sans text-sm tracking-[0.25em] uppercase text-[#6b7280] font-medium">
           Hello! I am
         </div>

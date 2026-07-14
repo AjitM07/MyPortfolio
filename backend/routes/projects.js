@@ -17,6 +17,24 @@ router.get('/', async (req, res) => {
   }
 });
 
+// @route   GET /api/projects/:id
+// @desc    Get a single project
+// @access  Public
+router.get('/:id', async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    res.json(project);
+  } catch (err) {
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
 // @route   POST /api/projects
 // @desc    Create a project
 // @access  Private

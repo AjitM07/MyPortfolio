@@ -10,6 +10,7 @@ import CustomCursor from './components/CustomCursor';
 import Home from './pages/Home';
 import Experience from './pages/Experience';
 import Projects from './pages/Projects';
+import ProjectReadme from './pages/ProjectReadme';
 import Skills from './pages/Skills';
 import Certifications from './pages/Certifications';
 import Blogs from './pages/Blogs';
@@ -36,6 +37,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/experience" element={<Experience />} />
             <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/:id/readme" element={<ProjectReadme />} />
             <Route path="/skills" element={<Skills />} />
             <Route path="/certifications" element={<Certifications />} />
             <Route path="/blogs" element={<Blogs />} />

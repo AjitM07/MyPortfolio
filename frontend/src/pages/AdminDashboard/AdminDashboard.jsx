@@ -21,8 +21,7 @@ const AdminDashboard = () => {
   const [expForm, setExpForm] = useState({ id: '', company: '', role: '', location: '', startDate: '', endDate: '', current: false, description: '', technologies: '', order: 0 });
   const [projectForm, setProjectForm] = useState({ id: '', title: '', subtitle: '', description: '', technologies: '', githubLink: '', liveLink: '', category: 'Web Development', order: 0 });
   const [projectFile, setProjectFile] = useState(null);
-  const [skillForm, setSkillForm] = useState({ id: '', name: '', category: 'Frontend', level: 80 });
-  const [skillFile, setSkillFile] = useState(null);
+  const [skillForm, setSkillForm] = useState({ id: '', name: '', category: 'Languages', level: 80 });
   const [certForm, setCertForm] = useState({ id: '', name: '', issuingOrganization: '', issueDate: '', credentialUrl: '', order: 0 });
   const [certFile, setCertFile] = useState(null);
   const [blogForm, setBlogForm] = useState({ id: '', title: '', content: '', tags: '', status: 'draft' });
@@ -226,7 +225,6 @@ const AdminDashboard = () => {
       fd.append('name', skillForm.name);
       fd.append('category', skillForm.category);
       fd.append('level', skillForm.level);
-      if (skillFile) fd.append('icon', skillFile);
 
       if (skillForm.id) {
         await api.put(`/skills/${skillForm.id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
@@ -235,8 +233,7 @@ const AdminDashboard = () => {
         await api.post('/skills', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         showMessage('Skill added!');
       }
-      setSkillForm({ id: '', name: '', category: 'Frontend', level: 80 });
-      setSkillFile(null);
+      setSkillForm({ id: '', name: '', category: 'Languages', level: 80 });
       fetchSkills();
     } catch (err) {
       console.error(err);
@@ -849,17 +846,19 @@ const AdminDashboard = () => {
                     value={skillForm.category}
                     onChange={(e) => setSkillForm({ ...skillForm, category: e.target.value })}
                   >
+                    <option value="Languages">Languages</option>
                     <option value="Frontend">Frontend</option>
                     <option value="Backend">Backend</option>
                     <option value="Database">Database</option>
-                    <option value="Tools & Technologies">Tools & Technologies</option>
+                    <option value="Deployment">Deployment</option>
+                    <option value="CI/CD">CI/CD</option>
                     <option value="Others">Others</option>
                   </select>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-6">
-                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <div className="flex-grow flex flex-col gap-2">
                   <label className="text-xs font-semibold text-text-secondary">Level (Proficiency %)</label>
                   <input
                     type="number"
@@ -869,15 +868,6 @@ const AdminDashboard = () => {
                     value={skillForm.level}
                     onChange={(e) => setSkillForm({ ...skillForm, level: Number(e.target.value) })}
                     required
-                  />
-                </div>
-                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-text-secondary">Skill Icon Image</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="glass-input"
-                    onChange={(e) => setSkillFile(e.target.files[0])}
                   />
                 </div>
               </div>
@@ -890,7 +880,7 @@ const AdminDashboard = () => {
                   <button
                     type="button"
                     className="glass-button"
-                    onClick={() => setSkillForm({ id: '', name: '', category: 'Frontend', level: 80 })}
+                    onClick={() => setSkillForm({ id: '', name: '', category: 'Languages', level: 80 })}
                   >
                     Cancel
                   </button>

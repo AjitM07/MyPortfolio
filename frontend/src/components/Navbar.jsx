@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { LayoutDashboard, Lock, LogOut } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,15 +22,71 @@ const Navbar = () => {
       : 'text-[#6b7280] hover:text-[#d1cdc7] after:w-0 hover:after:w-full after:bg-[#d1cdc7]');
 
   return (
-    <nav className="sticky top-0 left-0 w-full z-50 px-[5%] py-5 bg-transparent">
-      <div className="flex justify-between items-center max-w-6xl mx-auto w-full">
-        <Link to="/" className="text-base font-semibold tracking-[0.15em] text-[#e8e3d9] hover:text-white transition-colors duration-200 cursor-none" onClick={() => setIsOpen(false)}>
+    <nav className="sticky top-0 left-0 w-full z-50 px-6 py-4 bg-bg-primary/70 backdrop-blur-md border-b border-border-subtle">
+      <div className="flex justify-between items-center max-w-7xl mx-auto w-full gap-4">
+        {/* Left: Logo */}
+        <Link to="/" className="text-base font-semibold tracking-[0.15em] text-[#e8e3d9] hover:text-white transition-colors duration-200 cursor-none shrink-0" onClick={() => setIsOpen(false)}>
           &lt; AJIT's Portfolio / &gt;
         </Link>
 
-        {/* Hamburger Menu Toggle Button */}
+        {/* Middle: Navigation Tabs (Desktop only) */}
+        <div className="hidden md:flex items-center justify-center gap-6 flex-grow">
+          <NavLink to="/" end className={navItemClass}>
+            Home
+          </NavLink>
+          <NavLink to="/experience" className={navItemClass}>
+            Experience
+          </NavLink>
+          <NavLink to="/projects" className={navItemClass}>
+            Projects
+          </NavLink>
+          <NavLink to="/skills" className={navItemClass}>
+            Skills
+          </NavLink>
+          <NavLink to="/certifications" className={navItemClass}>
+            Certifications
+          </NavLink>
+          <NavLink to="/blogs" className={navItemClass}>
+            Blogs
+          </NavLink>
+          <NavLink to="/resume" className={navItemClass}>
+            Resume
+          </NavLink>
+        </div>
+
+        {/* Right: Admin controls (Desktop only) */}
+        <div className="hidden md:flex items-center justify-end gap-4 shrink-0">
+          {admin ? (
+            <>
+              <NavLink 
+                to="/admin" 
+                className={({ isActive }) => `inline-flex items-center justify-center w-9 h-9 border border-white/10 rounded-lg text-[#c8c3bb] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none ${isActive ? 'text-white border-white/25 bg-white/5' : ''}`}
+                title="Admin Dashboard"
+              >
+                <LayoutDashboard className="w-[18px] h-[18px]" />
+              </NavLink>
+              <button 
+                className="inline-flex items-center justify-center w-9 h-9 border border-white/10 rounded-lg text-[#6b7280] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none"
+                onClick={handleLogout}
+                title="Logout"
+              >
+                <LogOut className="w-[18px] h-[18px]" />
+              </button>
+            </>
+          ) : (
+            <Link 
+              to="/login" 
+              className="inline-flex items-center justify-center w-9 h-9 border border-white/10 rounded-lg text-[#6b7280] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none"
+              title="Admin Login"
+            >
+              <Lock className="w-[18px] h-[18px]" />
+            </Link>
+          )}
+        </div>
+
+        {/* Mobile Hamburger Toggle Button */}
         <button
-          className="flex flex-col justify-around w-6 h-5 bg-transparent border-none cursor-none p-0 z-50 md:hidden"
+          className="flex flex-col justify-around w-6 h-5 bg-transparent border-none cursor-none p-0 z-50 md:hidden shrink-0"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle navigation"
         >
@@ -38,8 +95,8 @@ const Navbar = () => {
           <span className={`w-6 h-[2px] bg-text-primary rounded-full transition-all duration-300 origin-[1px] ${isOpen ? '-rotate-45' : ''}`}></span>
         </button>
 
-        {/* Navigation Items */}
-        <div className={`fixed md:relative top-0 ${isOpen ? 'right-0' : 'right-[-100%]'} md:right-auto md:top-auto h-screen md:h-auto w-64 md:w-auto bg-bg-primary/95 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-l md:border-l-0 border-border-glass md:border-transparent flex flex-col md:flex-row items-center justify-center md:justify-end gap-8 md:gap-6 p-5 md:p-0 transition-all duration-300 z-40`}>
+        {/* Mobile Navigation Drawer */}
+        <div className={`fixed top-0 ${isOpen ? 'right-0' : 'right-[-100%]'} h-screen w-64 bg-bg-primary/98 backdrop-blur-xl border-l border-border-glass flex flex-col items-center justify-center gap-6 p-5 transition-all duration-300 z-40 md:hidden`}>
           <NavLink to="/" end className={navItemClass} onClick={() => setIsOpen(false)}>
             Home
           </NavLink>
@@ -62,20 +119,39 @@ const Navbar = () => {
             Resume
           </NavLink>
 
-          {admin ? (
-            <>
-              <NavLink to="/admin" className={({ isActive }) => `text-[0.9rem] font-medium py-1.5 px-4 border border-white/10 rounded text-[#c8c3bb] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none ${isActive ? 'text-white border-white/25' : ''}`} onClick={() => setIsOpen(false)}>
-                Dashboard
-              </NavLink>
-              <button className="text-[0.9rem] font-medium py-1.5 px-4 border border-white/10 rounded text-[#6b7280] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none" onClick={handleLogout}>
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link to="/login" className="text-lg opacity-50 hover:opacity-100 transition-opacity duration-300 cursor-none" aria-label="Admin Login" onClick={() => setIsOpen(false)}>
-              🔐
-            </Link>
-          )}
+          <div className="h-px bg-white/10 w-full my-4" />
+
+          {/* Mobile Admin Controls */}
+          <div className="flex gap-4 items-center">
+            {admin ? (
+              <>
+                <NavLink 
+                  to="/admin" 
+                  className={({ isActive }) => `inline-flex items-center justify-center w-11 h-11 border border-white/10 rounded-lg text-[#c8c3bb] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none ${isActive ? 'text-white border-white/25 bg-white/5' : ''}`}
+                  onClick={() => setIsOpen(false)}
+                  title="Admin Dashboard"
+                >
+                  <LayoutDashboard className="w-[20px] h-[20px]" />
+                </NavLink>
+                <button 
+                  className="inline-flex items-center justify-center w-11 h-11 border border-white/10 rounded-lg text-[#6b7280] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none"
+                  onClick={handleLogout}
+                  title="Logout"
+                >
+                  <LogOut className="w-[20px] h-[20px]" />
+                </button>
+              </>
+            ) : (
+              <Link 
+                to="/login" 
+                className="inline-flex items-center justify-center w-11 h-11 border border-white/10 rounded-lg text-[#6b7280] hover:text-white hover:border-white/25 transition-colors duration-200 cursor-none"
+                onClick={() => setIsOpen(false)}
+                title="Admin Login"
+              >
+                <Lock className="w-[20px] h-[20px]" />
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </nav>
