@@ -24,7 +24,7 @@ const AdminDashboard = () => {
   const [skillForm, setSkillForm] = useState({ id: '', name: '', category: 'Languages', level: 80 });
   const [certForm, setCertForm] = useState({ id: '', name: '', issuingOrganization: '', issueDate: '', credentialUrl: '', order: 0 });
   const [certFile, setCertFile] = useState(null);
-  const [blogForm, setBlogForm] = useState({ id: '', title: '', content: '', tags: '', status: 'draft' });
+  const [blogForm, setBlogForm] = useState({ id: '', title: '', content: '', tags: '', status: 'draft', isLinkedIn: false, linkedInUrl: '' });
   const [blogFile, setBlogFile] = useState(null);
 
   const [loading, setLoading] = useState(false);
@@ -303,9 +303,11 @@ const AdminDashboard = () => {
     try {
       const fd = new FormData();
       fd.append('title', blogForm.title);
-      fd.append('content', blogForm.content);
+      fd.append('content', blogForm.content || '');
       fd.append('tags', blogForm.tags);
       fd.append('status', blogForm.status);
+      fd.append('isLinkedIn', blogForm.isLinkedIn);
+      fd.append('linkedInUrl', blogForm.linkedInUrl || '');
       if (blogFile) fd.append('image', blogFile);
 
       if (blogForm.id) {
@@ -315,7 +317,7 @@ const AdminDashboard = () => {
         await api.post('/blogs', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         showMessage('Blog post added!');
       }
-      setBlogForm({ id: '', title: '', content: '', tags: '', status: 'draft' });
+      setBlogForm({ id: '', title: '', content: '', tags: '', status: 'draft', isLinkedIn: false, linkedInUrl: '' });
       setBlogFile(null);
       fetchBlogs();
     } catch (err) {
@@ -1076,14 +1078,43 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isLinkedIn"
+                  className="w-4 h-4 rounded border-border-glass bg-white/5 text-accent-blue focus:ring-accent-blue/30 focus:ring-offset-0 cursor-none"
+                  checked={blogForm.isLinkedIn}
+                  onChange={(e) => setBlogForm({ ...blogForm, isLinkedIn: e.target.checked })}
+                />
+                <label htmlFor="isLinkedIn" className="text-sm font-semibold text-text-primary cursor-none select-none">
+                  Import directly from a LinkedIn Post
+                </label>
+              </div>
+
+              {blogForm.isLinkedIn && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">LinkedIn Post URL or Embed Code</label>
+                  <input
+                    type="text"
+                    className="glass-input"
+                    placeholder="https://www.linkedin.com/posts/username_topic-activity-123456789... or <iframe>...</iframe>"
+                    value={blogForm.linkedInUrl}
+                    onChange={(e) => setBlogForm({ ...blogForm, linkedInUrl: e.target.value })}
+                    required={blogForm.isLinkedIn}
+                  />
+                </div>
+              )}
+
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-semibold text-text-secondary">Blog Content (Text/Markdown)</label>
+                <label className="text-xs font-semibold text-text-secondary">
+                  {blogForm.isLinkedIn ? 'Additional Commentary / Text (Optional)' : 'Blog Content (Text/Markdown)'}
+                </label>
                 <textarea
                   className="glass-input resize-vertical"
                   value={blogForm.content}
                   onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
                   rows={8}
-                  required
+                  required={!blogForm.isLinkedIn}
                 />
               </div>
 
@@ -1117,7 +1148,7 @@ const AdminDashboard = () => {
                   <button
                     type="button"
                     className="glass-button"
-                    onClick={() => setBlogForm({ id: '', title: '', content: '', tags: '', status: 'draft' })}
+                    onClick={() => setBlogForm({ id: '', title: '', content: '', tags: '', status: 'draft', isLinkedIn: false, linkedInUrl: '' })}
                   >
                     Cancel
                   </button>
@@ -1133,6 +1164,7 @@ const AdminDashboard = () => {
                     <h4 className="text-base font-semibold text-white">{blog.title}</h4>
                     <p className="text-xs text-text-secondary mt-1">
                       Status: <span className={blog.status === 'published' ? 'text-accent-blue' : 'text-accent-pink'}>{blog.status}</span>
+                      {blog.isLinkedIn && <span className="ml-2 text-accent-blue bg-accent-blue/10 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">LinkedIn</span>}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -1141,9 +1173,11 @@ const AdminDashboard = () => {
                       onClick={() => setBlogForm({
                         id: blog._id,
                         title: blog.title,
-                        content: blog.content,
+                        content: blog.content || '',
                         tags: blog.tags.join(', '),
-                        status: blog.status
+                        status: blog.status,
+                        isLinkedIn: blog.isLinkedIn || false,
+                        linkedInUrl: blog.linkedInUrl || ''
                       })}
                     >
                       Edit

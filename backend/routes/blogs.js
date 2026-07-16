@@ -16,6 +16,89 @@ const slugify = (text) => {
     .replace(/\-\-+/g, '-');
 };
 
+// Helper to parse LinkedIn URL and get the embed URL
+const getLinkedInEmbedUrl = (input) => {
+  if (!input) return '';
+  
+  // If it is iframe HTML, extract src
+  if (input.includes('<iframe')) {
+    const match = input.match(/src="([^"]+)"/);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+  
+  let url = input.trim();
+  
+  // Handle various LinkedIn URL formats to extract the URN
+  const urnMatch = url.match(/urn:li:(activity|share|ugcPost):\d+/);
+  if (urnMatch) {
+    return `https://www.linkedin.com/embed/feed/update/${urnMatch[0]}`;
+  }
+  
+  // E.g. posts/activity-7212345678901234567
+  const activityMatch = url.match(/activity-(\d+)/);
+  if (activityMatch) {
+    return `https://www.linkedin.com/embed/feed/update/urn:li:activity:${activityMatch[1]}`;
+  }
+  
+  // E.g. posts/share-7212345678901234567
+  const shareMatch = url.match(/share-(\d+)/);
+  if (shareMatch) {
+    return `https://www.linkedin.com/embed/feed/update/urn:li:share:${shareMatch[1]}`;
+  }
+  
+  // E.g. ugcPost-7212345678901234567
+  const ugcMatch = url.match(/ugcPost-(\d+)/);
+  if (ugcMatch) {
+    return `https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:${ugcMatch[1]}`;
+  }
+
+  // E.g. /posts/some-title-1234567890123456789
+  const genericPostsMatch = url.match(/\/posts\/[a-zA-Z0-9_-]+-(\d+)/) || url.match(/\/posts\/(\d+)/);
+  if (genericPostsMatch) {
+    return `https://www.linkedin.com/embed/feed/update/urn:li:activity:${genericPostsMatch[1]}`;
+  }
+  
+  // If already embed URL, return as is
+  if (url.includes('linkedin.com/embed/')) {
+    return url;
+  }
+  
+  return url;
+};
+
+const fetchLinkedInCaption = async (url) => {
+  try {
+    if (!url) return '';
+    // Use the native fetch available in Node.js 18+
+    const res = await fetch(url);
+    if (!res.ok) return '';
+    const html = await res.text();
+    
+    const match = html.match(/<meta name="description" content="([^"]+)"/) ||
+                  html.match(/<meta property="og:description" content="([^"]+)"/) ||
+                  html.match(/<meta name="twitter:description" content="([^"]+)"/);
+                  
+    if (match) {
+      let content = match[1];
+      // Decode HTML entities
+      content = content
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&apos;/g, "'")
+        .replace(/&nbsp;/g, ' ');
+      return content.trim();
+    }
+  } catch (err) {
+    console.error('Error scraping LinkedIn caption:', err.message);
+  }
+  return '';
+};
+
 // @route   GET /api/blogs
 // @desc    Get all blogs
 // @access  Public
@@ -59,6 +142,16 @@ router.get('/:slug', async (req, res) => {
     if (!blog) {
       return res.status(404).json({ message: 'Blog not found' });
     }
+    
+    // Fallback: fetch caption at runtime if content is empty
+    if (blog.isLinkedIn && (!blog.content || !blog.content.trim()) && blog.linkedInUrl) {
+      const caption = await fetchLinkedInCaption(blog.linkedInUrl);
+      if (caption) {
+        blog.content = caption;
+        await blog.save(); // Cache it in DB
+      }
+    }
+    
     res.json(blog);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -70,10 +163,19 @@ router.get('/:slug', async (req, res) => {
 // @access  Private
 router.post('/', protect, upload.single('image'), async (req, res) => {
   try {
-    const { title, content, tags, status } = req.body;
+    const { title, content, tags, status, isLinkedIn, linkedInUrl } = req.body;
+    const isLinkedInBool = isLinkedIn === 'true' || isLinkedIn === true;
 
-    if (!title || !content) {
-      return res.status(400).json({ message: 'Title and content are required' });
+    if (!title) {
+      return res.status(400).json({ message: 'Title is required' });
+    }
+
+    if (!isLinkedInBool && !content) {
+      return res.status(400).json({ message: 'Content is required' });
+    }
+
+    if (isLinkedInBool && !linkedInUrl) {
+      return res.status(400).json({ message: 'LinkedIn URL is required for LinkedIn posts' });
     }
 
     // Generate unique slug
@@ -100,13 +202,25 @@ router.post('/', protect, upload.single('image'), async (req, res) => {
       };
     }
 
+    let normalizedLinkedInUrl = '';
+    if (isLinkedInBool && linkedInUrl) {
+      normalizedLinkedInUrl = getLinkedInEmbedUrl(linkedInUrl);
+    }
+
+    let finalContent = content || '';
+    if (isLinkedInBool && (!finalContent || !finalContent.trim()) && normalizedLinkedInUrl) {
+      finalContent = await fetchLinkedInCaption(normalizedLinkedInUrl);
+    }
+
     const blog = await Blog.create({
       title,
-      content,
+      content: finalContent,
       tags: parsedTags,
       image,
       slug,
-      status: status || 'draft'
+      status: status || 'draft',
+      isLinkedIn: isLinkedInBool,
+      linkedInUrl: normalizedLinkedInUrl
     });
 
     res.status(201).json(blog);
@@ -120,15 +234,36 @@ router.post('/', protect, upload.single('image'), async (req, res) => {
 // @access  Private
 router.put('/:id', protect, upload.single('image'), async (req, res) => {
   try {
-    const { title, content, tags, status } = req.body;
+    const { title, content, tags, status, isLinkedIn, linkedInUrl } = req.body;
     const blog = await Blog.findById(req.params.id);
 
     if (!blog) {
       return res.status(404).json({ message: 'Blog not found' });
     }
 
-    if (content) blog.content = content;
+    const isLinkedInBool = isLinkedIn !== undefined ? (isLinkedIn === 'true' || isLinkedIn === true) : blog.isLinkedIn;
+
+    if (isLinkedInBool && !linkedInUrl && !blog.linkedInUrl) {
+      return res.status(400).json({ message: 'LinkedIn URL is required for LinkedIn posts' });
+    }
+
+    if (content !== undefined) blog.content = content;
     if (status) blog.status = status;
+    blog.isLinkedIn = isLinkedInBool;
+
+    if (isLinkedInBool && linkedInUrl !== undefined) {
+      blog.linkedInUrl = getLinkedInEmbedUrl(linkedInUrl);
+    } else if (!isLinkedInBool) {
+      blog.linkedInUrl = '';
+    }
+
+    // Auto-fetch LinkedIn caption if content is empty during update
+    if (isLinkedInBool && (!blog.content || !blog.content.trim()) && blog.linkedInUrl) {
+      const caption = await fetchLinkedInCaption(blog.linkedInUrl);
+      if (caption) {
+        blog.content = caption;
+      }
+    }
 
     if (tags) {
       blog.tags = Array.isArray(tags)
