@@ -122,7 +122,7 @@ const Home = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[80vh] text-lg font-medium text-[#6b7280] tracking-widest uppercase">
-        Loading...
+
       </div>
     );
   }

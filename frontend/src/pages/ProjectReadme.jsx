@@ -95,8 +95,8 @@ const ProjectReadme = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[80vh] text-2xl font-semibold text-accent text-glow">
-        Fetching Project README...
+      <div className="flex justify-center items-center min-h-[80vh]">
+        <div className="loader"></div>
       </div>
     );
   }

@@ -114,8 +114,8 @@ const Projects = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[80vh] text-2xl font-semibold text-accent text-glow">
-        Loading Projects...
+      <div className="flex justify-center items-center min-h-[80vh]">
+        <div className="loader"></div>
       </div>
     );
   }

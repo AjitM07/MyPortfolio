@@ -24,19 +24,34 @@ const AdminDashboard = () => {
   const [skillForm, setSkillForm] = useState({ id: '', name: '', category: 'Languages', level: 80 });
   const [certForm, setCertForm] = useState({ id: '', name: '', issuingOrganization: '', issueDate: '', credentialUrl: '', order: 0 });
   const [certFile, setCertFile] = useState(null);
-  const [blogForm, setBlogForm] = useState({ id: '', title: '', content: '', tags: '', status: 'draft', isLinkedIn: false, linkedInUrl: '' });
-  const [blogFile, setBlogFile] = useState(null);
+  const [blogForm, setBlogForm] = useState({ id: '', title: '', content: '', tags: '', status: 'draft', isLinkedIn: false, linkedInUrl: '', publishedAt: '' });
+  const [blogFile1, setBlogFile1] = useState(null);
+  const [blogFile2, setBlogFile2] = useState(null);
+  const [blogFile3, setBlogFile3] = useState(null);
 
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetchProfile();
-    fetchExperiences();
-    fetchProjects();
-    fetchSkills();
-    fetchCertifications();
-    fetchBlogs();
+    const loadAllData = async () => {
+      setPageLoading(true);
+      try {
+        await Promise.all([
+          fetchProfile(),
+          fetchExperiences(),
+          fetchProjects(),
+          fetchSkills(),
+          fetchCertifications(),
+          fetchBlogs()
+        ]);
+      } catch (err) {
+        console.error('Error loading admin dashboard data:', err);
+      } finally {
+        setPageLoading(false);
+      }
+    };
+    loadAllData();
   }, []);
 
   const showMessage = (msg) => {
@@ -308,7 +323,10 @@ const AdminDashboard = () => {
       fd.append('status', blogForm.status);
       fd.append('isLinkedIn', blogForm.isLinkedIn);
       fd.append('linkedInUrl', blogForm.linkedInUrl || '');
-      if (blogFile) fd.append('image', blogFile);
+      if (blogForm.publishedAt) fd.append('publishedAt', blogForm.publishedAt);
+      if (blogFile1) fd.append('image', blogFile1);
+      if (blogFile2) fd.append('image2', blogFile2);
+      if (blogFile3) fd.append('image3', blogFile3);
 
       if (blogForm.id) {
         await api.put(`/blogs/${blogForm.id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
@@ -317,8 +335,10 @@ const AdminDashboard = () => {
         await api.post('/blogs', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         showMessage('Blog post added!');
       }
-      setBlogForm({ id: '', title: '', content: '', tags: '', status: 'draft', isLinkedIn: false, linkedInUrl: '' });
-      setBlogFile(null);
+      setBlogForm({ id: '', title: '', content: '', tags: '', status: 'draft', isLinkedIn: false, linkedInUrl: '', publishedAt: '' });
+      setBlogFile1(null);
+      setBlogFile2(null);
+      setBlogFile3(null);
       fetchBlogs();
     } catch (err) {
       console.error(err);
@@ -338,6 +358,14 @@ const AdminDashboard = () => {
       console.error(err);
     }
   };
+
+  if (pageLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[80vh]">
+        <div className="loader"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-16 flex flex-col gap-8 z-10 relative">
@@ -1055,7 +1083,7 @@ const AdminDashboard = () => {
             <form onSubmit={handleBlogSubmit} className="flex flex-col gap-6">
               <h2 className="text-2xl font-bold gradient-text">{blogForm.id ? 'Edit' : 'Add'} Blog Post</h2>
               <div className="flex flex-col sm:flex-row gap-6">
-                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <div className="flex-[2] min-w-[250px] flex flex-col gap-2">
                   <label className="text-xs font-semibold text-text-secondary">Title</label>
                   <input
                     type="text"
@@ -1065,7 +1093,7 @@ const AdminDashboard = () => {
                     required
                   />
                 </div>
-                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                <div className="flex-1 min-w-[150px] flex flex-col gap-2">
                   <label className="text-xs font-semibold text-text-secondary">Publish Status</label>
                   <select
                     className="glass-input cursor-none"
@@ -1075,6 +1103,15 @@ const AdminDashboard = () => {
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
                   </select>
+                </div>
+                <div className="flex-1 min-w-[180px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Post Date (Optional)</label>
+                  <input
+                    type="date"
+                    className="glass-input"
+                    value={blogForm.publishedAt ? blogForm.publishedAt.substring(0, 10) : ''}
+                    onChange={(e) => setBlogForm({ ...blogForm, publishedAt: e.target.value })}
+                  />
                 </div>
               </div>
 
@@ -1130,12 +1167,33 @@ const AdminDashboard = () => {
                   />
                 </div>
                 <div className="flex-1 min-w-[250px] flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-text-secondary">Featured Image</label>
+                  <label className="text-xs font-semibold text-text-secondary">Featured Image 1</label>
                   <input
                     type="file"
                     accept="image/*"
                     className="glass-input"
-                    onChange={(e) => setBlogFile(e.target.files[0])}
+                    onChange={(e) => setBlogFile1(e.target.files[0])}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Featured Image 2 (Optional)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="glass-input"
+                    onChange={(e) => setBlogFile2(e.target.files[0])}
+                  />
+                </div>
+                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-text-secondary">Featured Image 3 (Optional)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="glass-input"
+                    onChange={(e) => setBlogFile3(e.target.files[0])}
                   />
                 </div>
               </div>
@@ -1148,7 +1206,12 @@ const AdminDashboard = () => {
                   <button
                     type="button"
                     className="glass-button"
-                    onClick={() => setBlogForm({ id: '', title: '', content: '', tags: '', status: 'draft', isLinkedIn: false, linkedInUrl: '' })}
+                    onClick={() => {
+                      setBlogForm({ id: '', title: '', content: '', tags: '', status: 'draft', isLinkedIn: false, linkedInUrl: '' });
+                      setBlogFile1(null);
+                      setBlogFile2(null);
+                      setBlogFile3(null);
+                    }}
                   >
                     Cancel
                   </button>
@@ -1170,15 +1233,21 @@ const AdminDashboard = () => {
                   <div className="flex gap-2">
                     <button
                       className="glass-button px-3 py-1.5 text-xs cursor-none"
-                      onClick={() => setBlogForm({
-                        id: blog._id,
-                        title: blog.title,
-                        content: blog.content || '',
-                        tags: blog.tags.join(', '),
-                        status: blog.status,
-                        isLinkedIn: blog.isLinkedIn || false,
-                        linkedInUrl: blog.linkedInUrl || ''
-                      })}
+                      onClick={() => {
+                        setBlogForm({
+                          id: blog._id,
+                          title: blog.title,
+                          content: blog.content || '',
+                          tags: blog.tags.join(', '),
+                          status: blog.status,
+                          isLinkedIn: blog.isLinkedIn || false,
+                          linkedInUrl: blog.linkedInUrl || '',
+                          publishedAt: blog.publishedAt || ''
+                        });
+                        setBlogFile1(null);
+                        setBlogFile2(null);
+                        setBlogFile3(null);
+                      }}
                     >
                       Edit
                     </button>

@@ -68,21 +68,53 @@ const getLinkedInEmbedUrl = (input) => {
   return url;
 };
 
+const extractLinkedInDate = (url) => {
+  if (!url) return null;
+  const match = url.match(/\b\d{19}\b/);
+  if (match) {
+    try {
+      const id = BigInt(match[0]);
+      const timestampMs = id >> 22n;
+      return new Date(Number(timestampMs));
+    } catch (e) {
+      console.error('Error extracting date from LinkedIn URN:', e.message);
+    }
+  }
+  return null;
+};
+
 const fetchLinkedInCaption = async (url) => {
   try {
     if (!url) return '';
-    // Use the native fetch available in Node.js 18+
     const res = await fetch(url);
     if (!res.ok) return '';
     const html = await res.text();
     
+    // First try: extract from the actual embed post commentary element to preserve formatting
+    const commentaryMatch = html.match(/<p\b[^>]*data-test-id="main-feed-activity-embed-card__commentary"[^>]*>([\s\S]*?)<\/p>/i) ||
+                            html.match(/<p\b[^>]*class="[^"]*attributed-text-segment-list__content[^"]*"[^>]*>([\s\S]*?)<\/p>/i);
+    
+    if (commentaryMatch) {
+      let processed = commentaryMatch[1].replace(/<br\s*\/?>/gi, '\n');
+      processed = processed.replace(/<[^>]+>/g, '');
+      processed = processed
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&apos;/g, "'")
+        .replace(/&nbsp;/g, ' ');
+      return processed.trim();
+    }
+
+    // Fallback: extract from meta tags if embed structure not found
     const match = html.match(/<meta name="description" content="([^"]+)"/) ||
                   html.match(/<meta property="og:description" content="([^"]+)"/) ||
                   html.match(/<meta name="twitter:description" content="([^"]+)"/);
                   
     if (match) {
       let content = match[1];
-      // Decode HTML entities
       content = content
         .replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
@@ -114,7 +146,12 @@ router.get('/', async (req, res) => {
       filter.status = 'published';
     }
 
-    const blogs = await Blog.find(filter).sort({ createdAt: -1 });
+    const blogs = await Blog.find(filter);
+    blogs.sort((a, b) => {
+      const dateA = a.publishedAt || a.createdAt;
+      const dateB = b.publishedAt || b.createdAt;
+      return new Date(dateB) - new Date(dateA);
+    });
     res.json(blogs);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -126,7 +163,12 @@ router.get('/', async (req, res) => {
 // @access  Private
 router.get('/admin', protect, async (req, res) => {
   try {
-    const blogs = await Blog.find().sort({ createdAt: -1 });
+    const blogs = await Blog.find();
+    blogs.sort((a, b) => {
+      const dateA = a.publishedAt || a.createdAt;
+      const dateB = b.publishedAt || b.createdAt;
+      return new Date(dateB) - new Date(dateA);
+    });
     res.json(blogs);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -161,9 +203,13 @@ router.get('/:slug', async (req, res) => {
 // @route   POST /api/blogs
 // @desc    Create a blog
 // @access  Private
-router.post('/', protect, upload.single('image'), async (req, res) => {
+router.post('/', protect, upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'image2', maxCount: 1 },
+  { name: 'image3', maxCount: 1 }
+]), async (req, res) => {
   try {
-    const { title, content, tags, status, isLinkedIn, linkedInUrl } = req.body;
+    const { title, content, tags, status, isLinkedIn, linkedInUrl, publishedAt } = req.body;
     const isLinkedInBool = isLinkedIn === 'true' || isLinkedIn === true;
 
     if (!title) {
@@ -195,16 +241,38 @@ router.post('/', protect, upload.single('image'), async (req, res) => {
     }
 
     let image = { url: '', publicId: '' };
-    if (req.file) {
-      image = {
-        url: req.file.path,
-        publicId: req.file.filename
-      };
+    let image2 = { url: '', publicId: '' };
+    let image3 = { url: '', publicId: '' };
+
+    if (req.files) {
+      if (req.files['image'] && req.files['image'][0]) {
+        image = {
+          url: req.files['image'][0].path,
+          publicId: req.files['image'][0].filename
+        };
+      }
+      if (req.files['image2'] && req.files['image2'][0]) {
+        image2 = {
+          url: req.files['image2'][0].path,
+          publicId: req.files['image2'][0].filename
+        };
+      }
+      if (req.files['image3'] && req.files['image3'][0]) {
+        image3 = {
+          url: req.files['image3'][0].path,
+          publicId: req.files['image3'][0].filename
+        };
+      }
     }
 
     let normalizedLinkedInUrl = '';
+    let finalPublishedAt = publishedAt || undefined;
     if (isLinkedInBool && linkedInUrl) {
       normalizedLinkedInUrl = getLinkedInEmbedUrl(linkedInUrl);
+      const extractedDate = extractLinkedInDate(normalizedLinkedInUrl);
+      if (extractedDate) {
+        finalPublishedAt = extractedDate;
+      }
     }
 
     let finalContent = content || '';
@@ -217,10 +285,13 @@ router.post('/', protect, upload.single('image'), async (req, res) => {
       content: finalContent,
       tags: parsedTags,
       image,
+      image2,
+      image3,
       slug,
       status: status || 'draft',
       isLinkedIn: isLinkedInBool,
-      linkedInUrl: normalizedLinkedInUrl
+      linkedInUrl: normalizedLinkedInUrl,
+      publishedAt: finalPublishedAt
     });
 
     res.status(201).json(blog);
@@ -232,9 +303,13 @@ router.post('/', protect, upload.single('image'), async (req, res) => {
 // @route   PUT /api/blogs/:id
 // @desc    Update a blog
 // @access  Private
-router.put('/:id', protect, upload.single('image'), async (req, res) => {
+router.put('/:id', protect, upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'image2', maxCount: 1 },
+  { name: 'image3', maxCount: 1 }
+]), async (req, res) => {
   try {
-    const { title, content, tags, status, isLinkedIn, linkedInUrl } = req.body;
+    const { title, content, tags, status, isLinkedIn, linkedInUrl, publishedAt } = req.body;
     const blog = await Blog.findById(req.params.id);
 
     if (!blog) {
@@ -249,10 +324,15 @@ router.put('/:id', protect, upload.single('image'), async (req, res) => {
 
     if (content !== undefined) blog.content = content;
     if (status) blog.status = status;
+    if (publishedAt !== undefined) blog.publishedAt = publishedAt || undefined;
     blog.isLinkedIn = isLinkedInBool;
 
     if (isLinkedInBool && linkedInUrl !== undefined) {
       blog.linkedInUrl = getLinkedInEmbedUrl(linkedInUrl);
+      const extractedDate = extractLinkedInDate(blog.linkedInUrl);
+      if (extractedDate) {
+        blog.publishedAt = extractedDate;
+      }
     } else if (!isLinkedInBool) {
       blog.linkedInUrl = '';
     }
@@ -284,19 +364,51 @@ router.put('/:id', protect, upload.single('image'), async (req, res) => {
       blog.slug = slug;
     }
 
-    if (req.file) {
-      // Delete old image
-      if (blog.image && blog.image.publicId) {
-        try {
-          await cloudinary.uploader.destroy(blog.image.publicId);
-        } catch (cErr) {
-          console.error('Failed to delete old blog image:', cErr.message);
+    if (req.files) {
+      if (req.files['image'] && req.files['image'][0]) {
+        // Delete old image
+        if (blog.image && blog.image.publicId) {
+          try {
+            await cloudinary.uploader.destroy(blog.image.publicId);
+          } catch (cErr) {
+            console.error('Failed to delete old blog image:', cErr.message);
+          }
         }
+        blog.image = {
+          url: req.files['image'][0].path,
+          publicId: req.files['image'][0].filename
+        };
       }
-      blog.image = {
-        url: req.file.path,
-        publicId: req.file.filename
-      };
+
+      if (req.files['image2'] && req.files['image2'][0]) {
+        // Delete old image2
+        if (blog.image2 && blog.image2.publicId) {
+          try {
+            await cloudinary.uploader.destroy(blog.image2.publicId);
+          } catch (cErr) {
+            console.error('Failed to delete old blog image2:', cErr.message);
+          }
+        }
+        blog.image2 = {
+          url: req.files['image2'][0].path,
+          publicId: req.files['image2'][0].filename
+        };
+      }
+
+      if (req.files['image3'] && req.files['image3'][0]) {
+        // Delete old image3
+        if (blog.image3 && blog.image3.publicId) {
+          try {
+            await cloudinary.uploader.destroy(blog.image3.publicId);
+          } catch (cErr) {
+            console.error('Failed to delete old blog image3:', cErr.message);
+          }
+        }
+        blog.image3 = {
+          url: req.files['image3'][0].path,
+          publicId: req.files['image3'][0].filename
+        };
+      }
     }
 
     await blog.save();
@@ -316,12 +428,15 @@ router.delete('/:id', protect, async (req, res) => {
       return res.status(404).json({ message: 'Blog not found' });
     }
 
-    // Delete image from Cloudinary
-    if (blog.image && blog.image.publicId) {
-      try {
-        await cloudinary.uploader.destroy(blog.image.publicId);
-      } catch (cErr) {
-        console.error('Failed to delete blog image on Cloudinary:', cErr.message);
+    // Delete images from Cloudinary
+    const imagesToDelete = [blog.image, blog.image2, blog.image3];
+    for (const img of imagesToDelete) {
+      if (img && img.publicId) {
+        try {
+          await cloudinary.uploader.destroy(img.publicId);
+        } catch (cErr) {
+          console.error('Failed to delete blog image on Cloudinary:', cErr.message);
+        }
       }
     }
 

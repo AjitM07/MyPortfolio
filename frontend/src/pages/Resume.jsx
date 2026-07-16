@@ -22,8 +22,8 @@ const Resume = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-height-[80vh] text-2xl font-semibold text-accent-blue text-glow">
-        Loading Resume...
+      <div className="flex justify-center items-center min-h-[80vh]">
+        <div className="loader"></div>
       </div>
     );
   }

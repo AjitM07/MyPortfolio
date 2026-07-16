@@ -11,7 +11,7 @@ const FadeInCard = ({ children, index }) => {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { 
+      {
         threshold: 0.05,
         rootMargin: '0px 0px -50px 0px' // triggers slightly before entering the screen for smooth flow
       }
@@ -34,11 +34,10 @@ const FadeInCard = ({ children, index }) => {
   return (
     <div
       ref={domRef}
-      className={`transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu will-change-transform ${
-        isVisible
-          ? 'opacity-100 translate-y-0 scale-100'
-          : 'opacity-0 translate-y-6 scale-[0.99]'
-      }`}
+      className={`transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu will-change-transform ${isVisible
+        ? 'opacity-100 translate-y-0 scale-100'
+        : 'opacity-0 translate-y-6 scale-[0.99]'
+        }`}
       style={{ transitionDelay: isVisible ? `${delay}ms` : '0ms' }}
     >
       {children}
@@ -77,8 +76,8 @@ const Certifications = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-height-[80vh] text-2xl font-semibold text-accent-blue text-glow">
-        Loading Certifications...
+      <div className="flex justify-center items-center min-h-[80vh]">
+        <div className="loader"></div>
       </div>
     );
   }
@@ -107,7 +106,7 @@ const Certifications = () => {
             return (
               <FadeInCard key={cert._id} index={index}>
                 <article
-                  className="glass-panel relative overflow-hidden group aspect-[4/3] flex flex-col justify-end w-full h-full min-h-[260px]"
+                  className="glass-panel relative overflow-hidden group aspect-[4/3] flex flex-col justify-end w-full h-full min-h-[260px] rounded-lg"
                 >
                   {/* Background Thumbnail Image */}
                   {thumbnailUrl && !imageErrors[cert._id] ? (

@@ -6,18 +6,8 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#030616',
-        color: '#00f0ff',
-        fontSize: '1.5rem',
-        fontWeight: 'bold',
-        textShadow: '0 0 10px rgba(0, 240, 255, 0.5)'
-      }}>
-        Loading Secure Session...
+      <div className="flex justify-center items-center min-h-[100vh]">
+        <div className="loader"></div>
       </div>
     );
   }

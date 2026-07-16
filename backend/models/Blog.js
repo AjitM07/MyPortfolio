@@ -13,8 +13,17 @@ const BlogSchema = new mongoose.Schema({
     url: { type: String, default: '' },
     publicId: { type: String, default: '' }
   },
+  image2: {
+    url: { type: String, default: '' },
+    publicId: { type: String, default: '' }
+  },
+  image3: {
+    url: { type: String, default: '' },
+    publicId: { type: String, default: '' }
+  },
   slug: { type: String, required: true, unique: true },
-  status: { type: String, enum: ['draft', 'published'], default: 'draft' }
+  status: { type: String, enum: ['draft', 'published'], default: 'draft' },
+  publishedAt: { type: Date }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Blog', BlogSchema);
