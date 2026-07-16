@@ -76,12 +76,8 @@ const Resume = () => {
             </div>
           </>
         ) : (
-          <div className="w-full max-w-4xl p-16 text-center flex flex-col items-center gap-5 glass-panel">
-            <FileText className="w-16 h-16 text-neutral-500 mb-2" />
-            <h3 className="text-xl font-bold">No Resume PDF Uploaded Yet</h3>
-            <p className="text-text-secondary text-sm">
-              Please upload your resume PDF in the Admin Dashboard!
-            </p>
+          <div className="glass-panel p-10 text-center text-text-secondary">
+            No Resume Found.
           </div>
         )}
       </div>

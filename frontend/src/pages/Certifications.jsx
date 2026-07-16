@@ -90,7 +90,7 @@ const Certifications = () => {
 
       {certifications.length === 0 ? (
         <div className="glass-panel p-10 text-center text-text-secondary">
-          No certifications uploaded yet. Manage them via the Admin Dashboard!
+          No certifications yet.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-15">

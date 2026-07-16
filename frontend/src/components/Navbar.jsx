@@ -26,7 +26,7 @@ const Navbar = () => {
       <div className="flex justify-between items-center max-w-7xl mx-auto w-full gap-4">
         {/* Left: Logo */}
         <Link to="/" className="text-base font-semibold tracking-[0.15em] text-[#e8e3d9] hover:text-white transition-colors duration-200 cursor-none shrink-0" onClick={() => setIsOpen(false)}>
-          &lt; AJIT's Portfolio / &gt;
+          &lt; AJIT's Portfolio /&gt;
         </Link>
 
         {/* Middle: Navigation Tabs (Desktop only) */}
