@@ -156,10 +156,10 @@ const Contact = () => {
                 <Mail className="w-5 h-5 text-[#e8e3d9]" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Email Me</span>
+                <span className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Email Me</span>
                 <a
                   href="mailto:ajitmangsulikar950@gmail.com"
-                  className="text-sm font-medium text-white hover:text-accent transition-colors cursor-none mt-0.5"
+                  className="text-md font-medium text-white hover:text-accent transition-colors cursor-none mt-0.5"
                 >
                   ajitmangsulikar950@gmail.com
                 </a>
@@ -171,8 +171,8 @@ const Contact = () => {
                 <MapPin className="w-5 h-5 text-[#e8e3d9]" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Location</span>
-                <span className="text-sm font-medium text-white mt-0.5">
+                <span className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Location</span>
+                <span className="text-md font-medium text-white mt-0.5">
                   Sangli, Maharashta
                 </span>
               </div>
