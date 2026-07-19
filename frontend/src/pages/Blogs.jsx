@@ -189,8 +189,8 @@ const Blogs = () => {
   // Single Blog Post View
   if (slug && currentBlog) {
     return (
-      <div className="w-[80vw] max-w-none mx-auto px-4 py-10">
-        <div className="mb-8">
+      <div className="w-full lg:w-[80vw] max-w-none mx-auto px-4 py-10">
+        <div className="mb-8 text-left">
           <Link to="/blogs" className="glass-button inline-flex items-center gap-1.5">
             <ArrowLeft className="w-4 h-4" />
             Back to Blogs
@@ -211,29 +211,29 @@ const Blogs = () => {
             {/* Left Column: Image/Visual Stack and optional LinkedIn Button */}
             <div className="flex flex-col gap-6 w-full">
               {currentBlog.image?.url && (
-                <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-white/10 bg-black/10">
+                <div className="w-full h-64 sm:h-80 rounded-xl p-2 overflow-hidden border border-white/10 bg-black/10">
                   <img
                     src={currentBlog.image.url}
                     alt={`${currentBlog.title} - 1`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover rounded-lg"
                   />
                 </div>
               )}
               {currentBlog.image2?.url && (
-                <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-white/10 bg-black/10">
+                <div className="w-full h-64 sm:h-80 rounded-xl  p-2 overflow-hidden border border-white/10 bg-black/10">
                   <img
                     src={currentBlog.image2.url}
                     alt={`${currentBlog.title} - 2`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover rounded-lg"
                   />
                 </div>
               )}
               {currentBlog.image3?.url && (
-                <div className="w-full h-64 sm:h-80 rounded-xl overflow-hidden border border-white/10 bg-black/10">
+                <div className="w-full h-64 sm:h-80 rounded-xl p-2 overflow-hidden border border-white/10 bg-black/10">
                   <img
                     src={currentBlog.image3.url}
                     alt={`${currentBlog.title} - 3`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover rounded-lg"
                   />
                 </div>
               )}
@@ -310,8 +310,8 @@ const Blogs = () => {
 
   // Blogs Horizontal Timeline View
   return (
-    <div className="w-[80vw] max-w-none mx-auto px-4 py-16 z-10 relative overflow-hidden">
-      <h1 className="text-4xl font-extrabold text-center mb-16 tracking-wide gradient-text text-glow">
+    <div className="w-full lg:w-[80vw] max-w-none mx-auto px-4 py-16 z-10 relative overflow-hidden">
+      <h1 className="text-3xl font-extrabold text-center mb-13 tracking-wide gradient-text text-glow">
         My Blogs
       </h1>
 

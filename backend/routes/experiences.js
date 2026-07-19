@@ -8,7 +8,7 @@ const { protect } = require('../middleware/auth');
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const experiences = await Experience.find().sort({ order: 1, startDate: -1 });
+    const experiences = await Experience.find().sort({ startDate: -1 });
     res.json(experiences);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });

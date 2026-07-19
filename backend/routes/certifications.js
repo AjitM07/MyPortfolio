@@ -10,7 +10,7 @@ const { cloudinary } = require('../config/cloudinary');
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const certifications = await Certification.find().sort({ order: 1, issueDate: -1 });
+    const certifications = await Certification.find().sort({ issueDate: -1 });
     res.json(certifications);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });

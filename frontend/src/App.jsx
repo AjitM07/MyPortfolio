@@ -15,6 +15,7 @@ import Skills from './pages/Skills';
 import Certifications from './pages/Certifications';
 import Blogs from './pages/Blogs';
 import Resume from './pages/Resume';
+import Contact from './pages/Contact';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 
@@ -43,6 +44,7 @@ function App() {
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/blogs/:slug" element={<Blogs />} />
             <Route path="/resume" element={<Resume />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             
             {/* Protected Admin Dashboard */}

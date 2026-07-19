@@ -88,7 +88,7 @@ const SkillCard = ({ skill, index }) => {
       {/* Donut Progress Ring + Flipping Logo */}
       <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 flex items-center justify-center">
         {/* Circular Donut (SVG Progress Ring) */}
-        <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 100 100">
+        <svg className="absolute top-0 left-0 w-full h-full -rotate-90 origin-center" viewBox="0 0 100 100">
           {/* Background Circle */}
           <circle
             cx="50"
@@ -110,7 +110,6 @@ const SkillCard = ({ skill, index }) => {
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
-            transform="rotate(-90 50 50)"
             className="transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)]"
             style={{ transitionDelay: isVisible ? `${delay + 100}ms` : '0ms' }}
           />
@@ -183,7 +182,7 @@ const Skills = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-16 z-10 relative">
 
-      <h1 className="text-4xl font-extrabold text-center mb-16 tracking-wide gradient-text text-glow animate-fade-in-up">
+      <h1 className="text-3xl font-extrabold text-center mb-13 tracking-wide gradient-text text-glow animate-fade-in-up">
         Skills
       </h1>
 

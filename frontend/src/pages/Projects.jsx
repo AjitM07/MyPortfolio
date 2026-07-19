@@ -49,7 +49,7 @@ const ProjectCard = ({ children, index }) => {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { 
+      {
         threshold: 0.05,
         rootMargin: '0px 0px -50px 0px'
       }
@@ -72,11 +72,10 @@ const ProjectCard = ({ children, index }) => {
   return (
     <div
       ref={domRef}
-      className={`transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu will-change-transform ${
-        isVisible
-          ? 'opacity-100 translate-y-0 scale-100'
-          : 'opacity-0 translate-y-8 scale-[0.98]'
-      }`}
+      className={`transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu will-change-transform ${isVisible
+        ? 'opacity-100 translate-y-0 scale-100'
+        : 'opacity-0 translate-y-8 scale-[0.98]'
+        }`}
       style={{ transitionDelay: isVisible ? `${delay}ms` : '0ms' }}
     >
       {children}
@@ -122,7 +121,7 @@ const Projects = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-16 z-10 relative">
-      <h1 className="text-4xl font-extrabold text-center mb-16 tracking-wide gradient-text text-glow animate-fade-in-up">
+      <h1 className="text-3xl font-extrabold text-center mb-13 tracking-wide gradient-text text-glow animate-fade-in-up">
         My Projects
       </h1>
 
@@ -153,7 +152,7 @@ const Projects = () => {
                 className="project-card glass-panel flex flex-col overflow-hidden h-full rounded-[24px] border border-white/5 hover:border-white/12 transition-all duration-300 hover:shadow-2xl group"
               >
                 {/* Mockup Frame around the screenshot */}
-                <div className="w-full bg-[#161616]/70 border-b border-white/5 p-6 flex justify-center items-center h-64 relative overflow-hidden shrink-0">
+                <div className="w-full bg-[#161616]/70 border-b border-white/5 flex justify-center items-center p-5 h-64 relative overflow-hidden shrink-0">
                   {project.image?.url ? (
                     <div className="w-full h-full rounded-xl overflow-hidden shadow-[0_12px_24px_rgba(0,0,0,0.5)] border border-white/10 relative">
                       <img

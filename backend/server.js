@@ -26,6 +26,7 @@ app.use('/api/skills', require('./routes/skills'));
 app.use('/api/certifications', require('./routes/certifications'));
 app.use('/api/blogs', require('./routes/blogs'));
 app.use('/api/experiences', require('./routes/experiences'));
+app.use('/api/contact', require('./routes/contact'));
 
 // Global Error Handler
 app.use((err, req, res, next) => {

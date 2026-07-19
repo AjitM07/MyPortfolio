@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import api from '../utils/api';
 import { Mail } from 'lucide-react';
+import Modal from '../components/Modal';
 
 const Home = () => {
   const [profile, setProfile] = useState(null);
@@ -12,6 +13,13 @@ const Home = () => {
   const [displayedText, setDisplayedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [typingIndex, setTypingIndex] = useState(0);
+
+  // Modal State
+  const [modalConfig, setModalConfig] = useState({ isOpen: false, title: '', message: '', type: 'info' });
+
+  const showAlert = (title, message) => {
+    setModalConfig({ isOpen: true, title, message, type: 'info' });
+  };
 
   // Image load & sliding states
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -128,10 +136,10 @@ const Home = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 h-[calc(100vh-155px)] max-h-[calc(100vh-160px)] overflow-hidden flex flex-col md:flex-row justify-center items-center md:items-end gap-5 md:gap-12 z-10 relative">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 h-auto md:h-[calc(100vh-100px)] md:overflow-hidden flex flex-col md:flex-row justify-center items-center md:items-end gap-5 md:gap-12 z-10 relative">
 
-      {/* Left Column: Portrait Image sticking to bottom */}
-      <div className={`relative flex-shrink-0 flex items-end justify-center h-[45vh] md:h-full max-h-[70vh] md:max-h-[calc(100vh-170px)] self-end md:-translate-x-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu ${imageAnimationClass}`}>
+      {/* Left Column: Portrait Image */}
+      <div className={`relative flex-shrink-0 flex items-end justify-center h-[50vh] sm:h-[55vh] md:h-full max-h-[75vh] md:max-h-full self-end md:-translate-x-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu ${imageAnimationClass}`}>
         {profile?.aboutImage?.url ? (
           <div className="relative h-full flex items-end justify-center overflow-visible">
             <img
@@ -151,12 +159,12 @@ const Home = () => {
       </div>
 
       {/* Right Column: Hero Text Content centered vertically on desktop */}
-      <div className="flex flex-col items-start gap-4 text-left max-w-xl md:my-auto pb-12 md:pb-0 md:-translate-x-30">
+      <div className="flex flex-col items-start gap-4 text-left max-w-xl md:my-auto pb-6 md:pb-0 md:-translate-x-30 px-6 sm:px-8 md:px-0">
         <div className={`font-sans text-sm tracking-[0.25em] uppercase text-[#6b7280] font-medium transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] delay-[100ms] transform-gpu ${textAnimationClass}`}>
           Hello! I am
         </div>
 
-        <h1 className={`text-5xl sm:text-6xl md:text-7xl lg:text-7xl font-black uppercase tracking-[-0.02em] text-white leading-none transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] delay-[250ms] transform-gpu ${textAnimationClass}`}>
+        <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-[-0.02em] text-white leading-none break-words max-w-full transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] delay-[250ms] transform-gpu ${textAnimationClass}`}>
           {profile?.name || 'AJIT MANGSULIKAR'}
         </h1>
 
@@ -172,7 +180,7 @@ const Home = () => {
               href="/api/profile/download-resume"
               onMouseMove={handleBtnMouseMove}
               onMouseLeave={handleBtnMouseLeave}
-              className="mt-4 cursor-none inline-flex items-center gap-2 border border-white/15 text-[#e8e3d9] text-base font-medium tracking-wide hover:bg-white/5 hover:border-white/30 hover:text-white transition-all duration-200 rounded py-3 px-7 animate-shimmer transform-gpu"
+              className="mt-3 cursor-none inline-flex items-center gap-2 border border-white/15 text-[#e8e3d9] text-base font-medium tracking-wide hover:bg-white/5 hover:border-white/30 hover:text-white transition-all duration-200 rounded py-3 px-5 animate-shimmer transform-gpu"
               style={{
                 transform: `translate(${btnOffset.x}px, ${btnOffset.y}px)`,
                 transition: btnOffset.x === 0 ? 'transform 0.5s cubic-bezier(0.215, 0.61, 0.355, 1)' : 'none'
@@ -184,19 +192,19 @@ const Home = () => {
             <button
               onMouseMove={handleBtnMouseMove}
               onMouseLeave={handleBtnMouseLeave}
-              className="mt-4 cursor-none inline-flex items-center gap-2 border border-white/10 text-[#4b5563] text-base font-medium tracking-wide rounded py-3 px-7 transform-gpu"
+              className="mt-3 cursor-none inline-flex items-center gap-2 border border-white/10 text-[#4b5563] text-base font-medium tracking-wide rounded py-3 px-5 transform-gpu"
               style={{
                 transform: `translate(${btnOffset.x}px, ${btnOffset.y}px)`,
                 transition: btnOffset.x === 0 ? 'transform 0.5s cubic-bezier(0.215, 0.61, 0.355, 1)' : 'none'
               }}
-              onClick={() => alert('Resume PDF has not been uploaded yet.')}
+              onClick={() => showAlert('Resume Unavailable')}
             >
               Download Resume
             </button>
           )}
 
           {/* Social Icons Row */}
-          <div className="flex items-center gap-7 mt-5">
+          <div className={`flex items-center gap-7 mt-5 transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] delay-[700ms] transform-gpu ${textAnimationClass}`}>
             <a
               href={profile?.socialLinks?.linkedin || '#'}
               target="_blank"
@@ -206,7 +214,7 @@ const Home = () => {
               onClick={(e) => {
                 if (!profile?.socialLinks?.linkedin) {
                   e.preventDefault();
-                  alert('LinkedIn link has not been configured yet.');
+                  showAlert('Link Unavailable');
                 }
               }}
             >
@@ -224,7 +232,7 @@ const Home = () => {
               onClick={(e) => {
                 if (!profile?.socialLinks?.github) {
                   e.preventDefault();
-                  alert('GitHub link has not been configured yet.');
+                  showAlert('Link Unavailable');
                 }
               }}
             >
@@ -242,7 +250,7 @@ const Home = () => {
               onClick={(e) => {
                 if (!profile?.socialLinks?.instagram) {
                   e.preventDefault();
-                  alert('Instagram link has not been configured yet.');
+                  showAlert('Link Unavailable');
                 }
               }}
             >
@@ -258,16 +266,29 @@ const Home = () => {
               onClick={(e) => {
                 if (!profile?.socialLinks?.email) {
                   e.preventDefault();
-                  alert('Email address has not been configured yet.');
+                  showAlert('Email Unavailable', 'Contact email address has not been configured yet.');
                 }
               }}
             >
               <Mail className="w-9 h-9 stroke-[1.8]" />
             </a>
           </div>
+
+          {/* Bio Description - emerges from the left after social links */}
+          <p className={`mt-4 text-sm sm:text-base text-[#9ca3af] font-light leading-relaxed max-w-lg transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] delay-[850ms] transform-gpu ${textAnimationClass}`}>
+            {profile?.bio || 'Full stack developer passionate about building modern web applications and scalable solutions.'}
+          </p>
         </div>
       </div>
 
+      {/* Info Notice Modal */}
+      <Modal
+        isOpen={modalConfig.isOpen}
+        type={modalConfig.type}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+      />
     </div>
   );
 };

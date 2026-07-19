@@ -35,7 +35,7 @@ const TimelineItem = ({ exp, index, formatDate }) => {
       if (!itemRef.current) return;
       const rect = itemRef.current.getBoundingClientRect();
       const triggerPoint = window.innerHeight * 0.6; // Matches triggerPoint in parent handleScroll
-      
+
       // Dot center is around top + 30px
       const bulletTop = rect.top + 30;
       setIsReached(bulletTop <= triggerPoint);
@@ -43,7 +43,7 @@ const TimelineItem = ({ exp, index, formatDate }) => {
 
     window.addEventListener('scroll', checkScrollReached);
     window.addEventListener('resize', checkScrollReached);
-    
+
     // Initial checks
     checkScrollReached();
     const timer = setTimeout(checkScrollReached, 100);
@@ -57,9 +57,8 @@ const TimelineItem = ({ exp, index, formatDate }) => {
 
   const cardTransitionClasses = isVisible
     ? 'opacity-100 translate-x-0 scale-100 border-border-medium'
-    : `opacity-0 -translate-x-8 ${
-        index % 2 === 0 ? 'md:translate-x-12' : 'md:-translate-x-12'
-      } scale-[0.96] border-border-subtle`;
+    : `opacity-0 -translate-x-8 ${index % 2 === 0 ? 'md:translate-x-12' : 'md:-translate-x-12'
+    } scale-[0.96] border-border-subtle`;
 
   return (
     <div
@@ -68,18 +67,16 @@ const TimelineItem = ({ exp, index, formatDate }) => {
     >
       {/* Timeline Bullet Dot */}
       <div
-        className={`absolute w-5 h-5 bg-bg-primary rounded-full z-10 top-[30px] left-[23px] md:left-1/2 md:-translate-x-1/2 border-[3px] transition-all duration-500 ${
-          isReached
-            ? 'border-accent shadow-[0_0_12px_rgba(232,227,217,0.8)] scale-110'
-            : 'border-border-medium scale-90'
-        }`}
+        className={`absolute w-5 h-5 bg-bg-primary rounded-full z-10 top-[30px] left-[31px] md:left-1/2 -translate-x-1/2 border-[3px] transition-all duration-500 ${isReached
+          ? 'border-accent shadow-[0_0_12px_rgba(232,227,217,0.8)] scale-110'
+          : 'border-border-medium scale-90'
+          }`}
       ></div>
 
       {/* Timeline Content Card */}
       <div
-        className={`w-full md:w-[45%] glass-panel p-5 md:p-8 relative transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu will-change-transform ${
-          index % 2 === 0 ? 'md:mr-auto' : 'md:ml-auto'
-        } ${cardTransitionClasses}`}
+        className={`w-full md:w-[45%] glass-panel p-5 md:p-8 relative transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu will-change-transform ${index % 2 === 0 ? 'md:mr-auto' : 'md:ml-auto'
+          } ${cardTransitionClasses}`}
       >
         <div className="text-sm md:text-md font-semibold text-accent mb-2 opacity-80">
           {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
@@ -98,18 +95,6 @@ const TimelineItem = ({ exp, index, formatDate }) => {
             </li>
           ))}
         </ul>
-        {exp.technologies && exp.technologies.length > 0 && (
-          <div className="flex gap-2 flex-wrap mt-4">
-            {exp.technologies.map((tech, tIdx) => (
-              <span
-                key={tIdx}
-                className="text-xs md:text-sm font-semibold text-accent bg-accent/8 border border-accent/15 px-2.5 py-1 md:px-4 md:py-1.5 rounded-full"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
@@ -145,10 +130,10 @@ const Experience = () => {
       // The line starts animating when the top of the container enters the middle/bottom of viewport
       // And completes when the bottom of the container reaches the same trigger point.
       const triggerPoint = windowHeight * 0.6; // 60% of viewport height from the top
-      
+
       const totalHeight = rect.height;
       const scrolled = triggerPoint - rect.top;
-      
+
       let progress = scrolled / totalHeight;
       progress = Math.max(0, Math.min(1, progress));
 
@@ -186,8 +171,8 @@ const Experience = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-16 z-10 relative">
-      <h1 className="text-4xl font-extrabold text-center mb-16 tracking-wide gradient-text text-glow animate-fade-in-up">
-        Professional Journey
+      <h1 className="text-3xl font-extrabold text-center mb-13 tracking-wide gradient-text text-glow animate-fade-in-up">
+        Professional Experience
       </h1>
 
       {experiences.length === 0 ? (

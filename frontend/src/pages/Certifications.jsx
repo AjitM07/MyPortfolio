@@ -84,7 +84,7 @@ const Certifications = () => {
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 md:px-8 py-16 z-10 relative">
-      <h1 className="text-4xl font-extrabold text-center mb-16 tracking-wide gradient-text text-glow animate-fade-in-up">
+      <h1 className="text-3xl font-extrabold text-center mb-13 tracking-wide gradient-text text-glow animate-fade-in-up">
         Certifications
       </h1>
 
