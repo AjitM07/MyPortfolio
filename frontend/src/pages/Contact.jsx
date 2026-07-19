@@ -61,7 +61,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 md:px-8 py-16 z-10 relative">
+    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 z-10 relative animate-fade-in">
       {/* Section Header */}
       <h1 className="text-3xl font-extrabold text-center mb-13 tracking-wide gradient-text text-glow animate-fade-in-up">
         Contact Me
@@ -83,7 +83,7 @@ const Contact = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="John Doe"
+                placeholder="Your Name"
                 required
                 className="glass-input text-sm"
               />
@@ -100,7 +100,7 @@ const Contact = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="john@example.com"
+                placeholder="Your Email"
                 required
                 className="glass-input text-sm"
               />
@@ -173,7 +173,7 @@ const Contact = () => {
               <div className="flex flex-col">
                 <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Location</span>
                 <span className="text-sm font-medium text-white mt-0.5">
-                  India
+                  Sangli, Maharashta
                 </span>
               </div>
             </div>

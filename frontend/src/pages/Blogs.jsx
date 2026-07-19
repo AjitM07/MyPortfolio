@@ -130,13 +130,39 @@ const Blogs = () => {
       const cards = container.querySelectorAll('.timeline-item-container');
       if (cards.length === 0) return;
 
+      const firstCard = cards[0];
       const lastCard = cards[cards.length - 1];
+
+      // Dynamically calculate the center position of first & last dot relative to scroll container
+      const firstDotPos = firstCard.offsetLeft + (firstCard.offsetWidth / 2);
+      const lastDotPos = lastCard.offsetLeft + (lastCard.offsetWidth / 2);
+
+      // ── Vertical alignment: read the actual rendered dot position from the DOM ──
+      // This is cross-browser safe: offsetTop returns rendered px regardless of rem,
+      // DPI scaling, or minimum font-size settings (the Chrome vs Brave difference).
+      const firstDot = firstCard.querySelector('.timeline-dot');
+      if (firstDot) {
+        // offsetTop of dot relative to its card + card's offsetTop relative to container
+        const dotCenterY = firstCard.offsetTop + firstDot.offsetTop + (firstDot.offsetHeight / 2);
+        const lineTop = dotCenterY - 1; // -1 so the 2px line straddles the center (1px above + 1px below)
+
+        lineRef.current.style.top = `${lineTop}px`;
+
+        const bgTrack = container.querySelector('.timeline-bg-track');
+        if (bgTrack) {
+          bgTrack.style.top   = `${lineTop}px`;
+          bgTrack.style.left  = `${firstDotPos}px`;
+          bgTrack.style.width = `${Math.max(0, lastDotPos - firstDotPos)}px`;
+        }
+      }
+
+      // Set active line horizontal start position
+      lineRef.current.style.left = `${firstDotPos}px`;
+
       const lastCardRect = lastCard.getBoundingClientRect();
       const containerRect = container.getBoundingClientRect();
       const isLastCardVisible = lastCardRect.right <= containerRect.right + 5;
 
-      const firstDotPos = 201;
-      const lastDotPos = scrollWidth - 201;
       const triggerOffset = clientWidth * 0.4;
       const currentTriggerPos = scrollLeft + triggerOffset;
 
@@ -160,7 +186,7 @@ const Blogs = () => {
         });
       }
 
-      lineRef.current.style.width = `${activeLineWidth}px`;
+      lineRef.current.style.width = `${Math.max(0, activeLineWidth)}px`;
       setReachedIndices(nextReached);
     };
 
@@ -323,11 +349,11 @@ const Blogs = () => {
         <div className="relative">
           {/* Horizontal Row of Cards */}
           <div ref={containerRef} className="flex flex-row gap-10 overflow-x-auto pb-10 pt-20 px-4 relative z-10 custom-scrollbar scroll-smooth">
-            {/* Horizontal Timeline Line */}
-            <div className="absolute left-[201px] right-[201px] top-[47px] h-[2px] bg-border-subtle z-0"></div>
+            {/* Horizontal Timeline Line — top/left/width set dynamically via JS */}
+            <div className="timeline-bg-track absolute h-[2px] bg-border-subtle z-0 pointer-events-none"></div>
             <div
               ref={lineRef}
-              className="absolute left-[201px] top-[47px] h-[2px] bg-gradient-to-r from-accent to-accent-dim z-0 pointer-events-none transition-all duration-100 ease-out"
+              className="absolute h-[2px] bg-gradient-to-r from-accent to-accent-dim z-0 pointer-events-none transition-all duration-100 ease-out"
               style={{ width: '0px' }}
             ></div>
 
@@ -343,9 +369,9 @@ const Blogs = () => {
                   {formatMonthYear(blog.publishedAt || blog.createdAt)}
                 </div>
 
-                {/* Timeline Dot (Node) */}
+                {/* Timeline Dot (Node) — 'timeline-dot' class lets JS read its offsetTop */}
                 <div
-                  className={`w-5 h-5 bg-bg-primary rounded-full z-20 absolute top-[-44px] border-[3px] transition-all duration-500 ${reachedIndices.has(index)
+                  className={`timeline-dot w-5 h-5 bg-bg-primary rounded-full z-20 absolute top-[-44px] border-[3px] transition-all duration-500 ${reachedIndices.has(index)
                     ? 'border-accent shadow-[0_0_12px_rgba(232,227,217,0.8)] scale-110'
                     : 'border-border-medium scale-90 opacity-60'
                     }`}

@@ -139,7 +139,7 @@ const Home = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 h-auto md:h-[calc(100vh-100px)] md:overflow-hidden flex flex-col md:flex-row justify-center items-center md:items-end gap-5 md:gap-12 z-10 relative">
 
       {/* Left Column: Portrait Image */}
-      <div className={`relative flex-shrink-0 flex items-end justify-center h-[50vh] sm:h-[55vh] md:h-full max-h-[75vh] md:max-h-full self-end md:-translate-x-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu ${imageAnimationClass}`}>
+      <div className={`relative flex-shrink-0 flex items-end justify-center h-[45vh] sm:h-[48vh] md:h-full max-h-[70vh] md:max-h-full self-end md:-translate-x-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu ${imageAnimationClass}`}>
         {profile?.aboutImage?.url ? (
           <div className="relative h-full flex items-end justify-center overflow-visible">
             <img
