@@ -1,7 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
 import { Mail, Send, MapPin, User, MessageSquare, Loader2 } from 'lucide-react';
 import Modal from '../components/Modal';
+
+const FadeInItem = ({ children, delay = 0 }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      {
+        threshold: 0.05,
+        rootMargin: '0px 0px -30px 0px'
+      }
+    );
+
+    if (domRef.current) {
+      observer.observe(domRef.current);
+    }
+
+    return () => {
+      if (domRef.current) {
+        observer.unobserve(domRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      ref={domRef}
+      className={`transition-all duration-[1000ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu will-change-transform ${isVisible
+        ? 'opacity-100 translate-y-0 scale-100'
+        : 'opacity-0 translate-y-6 scale-[0.99]'
+        }`}
+      style={{ transitionDelay: isVisible ? `${delay}ms` : '0ms' }}
+    >
+      {children}
+    </div>
+  );
+};
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -61,7 +101,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 z-10 relative animate-fade-in">
+    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 z-10 relative">
       {/* Section Header */}
       <h1 className="text-3xl font-extrabold text-center mb-13 tracking-wide gradient-text text-glow animate-fade-in-up">
         Contact Me
@@ -70,115 +110,119 @@ const Contact = () => {
       {/* Main Grid: Form Left, Info Right */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] gap-8 items-start">
         {/* Contact Form Glass Panel */}
-        <div className="glass-panel p-6 sm:p-8 rounded-xl border border-white/10 bg-[#0d0d0d]/80 backdrop-blur-md shadow-xl">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            {/* Name Input */}
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-2">
-                <User className="w-5 h-5 text-accent" />
-                Your Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Your Name"
-                required
-                className="glass-input text-sm"
-              />
-            </div>
+        <FadeInItem delay={100}>
+          <div className="glass-panel p-6 sm:p-8 rounded-xl border border-white/10 bg-[#0d0d0d]/80 backdrop-blur-md shadow-xl">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+              {/* Name Input */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-2">
+                  <User className="w-5 h-5 text-accent" />
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Your Name"
+                  required
+                  className="glass-input text-sm"
+                />
+              </div>
 
-            {/* Email Input */}
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-2">
-                <Mail className="w-5 h-5 text-accent" />
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Your Email"
-                required
-                className="glass-input text-sm"
-              />
-            </div>
+              {/* Email Input */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-accent" />
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Your Email"
+                  required
+                  className="glass-input text-sm"
+                />
+              </div>
 
-            {/* Message Textarea */}
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-accent" />
-                Your Message
-              </label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                rows={6}
-                placeholder="Write your message here..."
-                required
-                className="glass-input text-sm resize-none leading-relaxed"
-              />
-            </div>
+              {/* Message Textarea */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-accent" />
+                  Your Message
+                </label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  rows={6}
+                  placeholder="Write your message here..."
+                  required
+                  className="glass-input text-sm resize-none leading-relaxed"
+                />
+              </div>
 
-            {/* Dynamic Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="glass-button active w-full sm:w-auto px-8 py-3.5 justify-center inline-flex items-center gap-2 font-semibold text-sm cursor-none mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-[#e8e3d9]" />
-                  <span>Sending Message...</span>
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4 text-accent" />
-                  <span>Send Message</span>
-                </>
-              )}
-            </button>
-          </form>
-        </div>
+              {/* Dynamic Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="glass-button active w-full sm:w-auto px-8 py-3.5 justify-center inline-flex items-center gap-2 font-semibold text-sm cursor-none mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-[#e8e3d9]" />
+                    <span>Sending Message...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 text-accent" />
+                    <span>Send Message</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </FadeInItem>
 
         {/* Contact Info Sidebar */}
-        <div className="flex flex-col gap-6">
-          <div className="glass-panel p-6 rounded-xl border border-white/10 bg-[#0d0d0d]/80 backdrop-blur-md flex flex-col gap-5">
-            <h3 className="text-lg font-bold text-white tracking-wide border-b border-white/10 pb-3">
-              Direct Contact
-            </h3>
+        <FadeInItem delay={200}>
+          <div className="flex flex-col gap-6">
+            <div className="glass-panel p-6 rounded-xl border border-white/10 bg-[#0d0d0d]/80 backdrop-blur-md flex flex-col gap-5">
+              <h3 className="text-lg font-bold text-white tracking-wide border-b border-white/10 pb-3">
+                Direct Contact
+              </h3>
 
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-accent shrink-0 mt-0.5">
-                <Mail className="w-5 h-5 text-[#e8e3d9]" />
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-accent shrink-0 mt-0.5">
+                  <Mail className="w-5 h-5 text-[#e8e3d9]" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Email Me</span>
+                  <a
+                    href="mailto:ajitmangsulikar950@gmail.com"
+                    className="text-md font-medium text-white hover:text-accent transition-colors cursor-none mt-0.5"
+                  >
+                    ajitmangsulikar950@gmail.com
+                  </a>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Email Me</span>
-                <a
-                  href="mailto:ajitmangsulikar950@gmail.com"
-                  className="text-md font-medium text-white hover:text-accent transition-colors cursor-none mt-0.5"
-                >
-                  ajitmangsulikar950@gmail.com
-                </a>
-              </div>
-            </div>
 
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-accent shrink-0 mt-0.5">
-                <MapPin className="w-5 h-5 text-[#e8e3d9]" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Location</span>
-                <span className="text-md font-medium text-white mt-0.5">
-                  Sangli, Maharashta
-                </span>
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-accent shrink-0 mt-0.5">
+                  <MapPin className="w-5 h-5 text-[#e8e3d9]" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Location</span>
+                  <span className="text-md font-medium text-white mt-0.5">
+                    Sangli, Maharashta
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </FadeInItem>
       </div>
 
       {/* Modal Dialog */}
