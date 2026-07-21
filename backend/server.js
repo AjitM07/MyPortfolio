@@ -13,10 +13,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Welcome Route
+// Welcome & Health Check Routes
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the Portfolio API!' });
 });
+
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 
 // Define Routes
 app.use('/api/auth', require('./routes/auth'));
