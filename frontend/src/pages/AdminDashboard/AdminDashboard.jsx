@@ -49,6 +49,11 @@ const AdminDashboard = () => {
   const [blogFile2, setBlogFile2] = useState(null);
   const [blogFile3, setBlogFile3] = useState(null);
 
+  // Local Skill Icon Upload States
+  const [localSkillIconFile, setLocalSkillIconFile] = useState(null);
+  const [localUploadLoading, setLocalUploadLoading] = useState(false);
+  const [localUploadMessage, setLocalUploadMessage] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [message, setMessage] = useState('');
@@ -357,6 +362,34 @@ const AdminDashboard = () => {
         showNotice('Error', 'Failed to delete skill entry', 'danger');
       }
     });
+  };
+
+  const handleLocalSkillIconUpload = async () => {
+    if (!localSkillIconFile) return;
+    setLocalUploadLoading(true);
+    setLocalUploadMessage('');
+    try {
+      const fd = new FormData();
+      fd.append('file', localSkillIconFile);
+
+      const res = await api.post('/skills/upload-local', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      setLocalUploadMessage(res.data.message);
+      showNotice('Upload Successful', `Image "${res.data.filename}" has been added to public/skills!`);
+      setLocalSkillIconFile(null);
+
+      const fileInput = document.getElementById('localSkillIconInput');
+      if (fileInput) fileInput.value = '';
+    } catch (err) {
+      console.error(err);
+      const errMsg = err.response?.data?.message || 'Failed to upload image locally';
+      showNotice('Upload Error', errMsg, 'danger');
+      setLocalUploadMessage(errMsg);
+    } finally {
+      setLocalUploadLoading(false);
+    }
   };
 
   // Certification CRUD
@@ -1005,77 +1038,123 @@ const AdminDashboard = () => {
         {/* Tab 4: Skills */}
         {activeTab === 'skills' && (
           <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10">
-            <form onSubmit={handleSkillSubmit} className="flex flex-col gap-6">
-              <h2 className="text-2xl font-bold gradient-text">{skillForm.id ? 'Edit' : 'Add'} Skill</h2>
-              <div className="flex flex-col sm:flex-row gap-6">
-                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-text-secondary">Skill Name</label>
-                  <input
-                    type="text"
-                    className="glass-input"
-                    value={skillForm.name}
-                    onChange={(e) => setSkillForm({ ...skillForm, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="flex-1 min-w-[250px] flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-text-secondary">Category</label>
-                  <select
-                    className="glass-input cursor-none"
-                    value={skillForm.category}
-                    onChange={(e) => setSkillForm({ ...skillForm, category: e.target.value })}
-                  >
-                    <option value="Languages">Languages</option>
-                    <option value="Frontend">Frontend</option>
-                    <option value="Backend">Backend</option>
-                    <option value="Database">Database</option>
-                    <option value="Deployment">Deployment</option>
-                    <option value="CI/CD">CI/CD</option>
-                    <option value="Others">Others</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-6">
-                <div className="flex-grow flex flex-col gap-3">
-                  <div className="flex justify-between items-center">
-                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Level (Proficiency %)</label>
-                    <span className="text-sm font-bold text-accent">{skillForm.level}%</span>
+            <div className="flex flex-col gap-8">
+              <form onSubmit={handleSkillSubmit} className="flex flex-col gap-6">
+                <h2 className="text-2xl font-bold gradient-text">{skillForm.id ? 'Edit' : 'Add'} Skill</h2>
+                <div className="flex flex-col sm:flex-row gap-6">
+                  <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                    <label className="text-xs font-semibold text-text-secondary">Skill Name</label>
+                    <input
+                      type="text"
+                      className="glass-input"
+                      value={skillForm.name}
+                      onChange={(e) => setSkillForm({ ...skillForm, name: e.target.value })}
+                      required
+                    />
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    className="custom-slider w-full cursor-none focus:outline-none"
-                    value={skillForm.level}
-                    onChange={(e) => setSkillForm({ ...skillForm, level: Number(e.target.value) })}
-                    required
-                  />
+                  <div className="flex-1 min-w-[250px] flex flex-col gap-2">
+                    <label className="text-xs font-semibold text-text-secondary">Category</label>
+                    <select
+                      className="glass-input cursor-none"
+                      value={skillForm.category}
+                      onChange={(e) => setSkillForm({ ...skillForm, category: e.target.value })}
+                    >
+                      <option value="Languages">Languages</option>
+                      <option value="Frontend">Frontend</option>
+                      <option value="Backend">Backend</option>
+                      <option value="Database">Database</option>
+                      <option value="Deployment">Deployment</option>
+                      <option value="CI/CD">CI/CD</option>
+                      <option value="Others">Others</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex gap-4">
-                <button type="submit" className="glass-button active flex-1 justify-center inline-flex items-center gap-2" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin text-[#e8e3d9]" />
-                      <span>{skillForm.id ? 'Updating...' : 'Adding...'}</span>
-                    </>
-                  ) : (
-                    skillForm.id ? 'Update' : 'Add'
+                <div className="flex flex-col sm:flex-row gap-6">
+                  <div className="flex-grow flex flex-col gap-3">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Level (Proficiency %)</label>
+                      <span className="text-sm font-bold text-accent">{skillForm.level}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      className="custom-slider w-full cursor-none focus:outline-none"
+                      value={skillForm.level}
+                      onChange={(e) => setSkillForm({ ...skillForm, level: Number(e.target.value) })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <button type="submit" className="glass-button active flex-1 justify-center inline-flex items-center gap-2" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-[#e8e3d9]" />
+                        <span>{skillForm.id ? 'Updating...' : 'Adding...'}</span>
+                      </>
+                    ) : (
+                      skillForm.id ? 'Update' : 'Add'
+                    )}
+                  </button>
+                  {skillForm.id && (
+                    <button
+                      type="button"
+                      className="glass-button"
+                      onClick={() => setSkillForm({ id: '', name: '', category: 'Languages', level: 80 })}
+                    >
+                      Cancel
+                    </button>
                   )}
-                </button>
-                {skillForm.id && (
+                </div>
+              </form>
+
+              {/* Upload Local Skill Icon Section */}
+              <div className="glass-panel p-6 rounded-xl border border-white/10 flex flex-col gap-4">
+                <h3 className="text-lg font-bold text-white tracking-wide">Upload Skill Icon Image</h3>
+                <div className="flex flex-col gap-4">
+                  <div className="relative border border-dashed border-white/10 hover:border-white/20 rounded-lg p-5 text-center cursor-none transition-all duration-200 bg-white/[0.01] hover:bg-white/[0.02] group">
+                    <input
+                      type="file"
+                      id="localSkillIconInput"
+                      accept="image/*"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-none z-10"
+                      onChange={(e) => setLocalSkillIconFile(e.target.files[0])}
+                    />
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <ImageIcon className="w-5 h-5 text-accent opacity-75 group-hover:scale-105 transition-transform" />
+                      <span className="text-sm font-medium text-text-primary">
+                        {localSkillIconFile ? localSkillIconFile.name : 'Choose Skill Icon Image'}
+                      </span>
+                      <span className="text-xs text-text-secondary">
+                        {localSkillIconFile ? (localSkillIconFile.size < 1024 * 1024 ? `${(localSkillIconFile.size / 1024).toFixed(1)} KB` : `${(localSkillIconFile.size / (1024 * 1024)).toFixed(2)} MB`) : 'Click to browse or drag file'}
+                      </span>
+                    </div>
+                  </div>
+
                   <button
                     type="button"
-                    className="glass-button"
-                    onClick={() => setSkillForm({ id: '', name: '', category: 'Languages', level: 80 })}
+                    onClick={handleLocalSkillIconUpload}
+                    className="glass-button active justify-center inline-flex items-center gap-2 w-full sm:w-auto self-end"
+                    disabled={localUploadLoading || !localSkillIconFile}
                   >
-                    Cancel
+                    {localUploadLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-[#e8e3d9]" />
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 text-accent" />
+                        <span>Upload Image</span>
+                      </>
+                    )}
                   </button>
-                )}
+                </div>
               </div>
-            </form>
+            </div>
 
             <div className="flex flex-col gap-4">
               <h2 className="text-2xl font-bold gradient-text">Existing Skills</h2>

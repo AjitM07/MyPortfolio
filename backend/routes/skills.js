@@ -113,4 +113,46 @@ router.delete('/:id', protect, async (req, res) => {
   }
 });
 
+// Configure local disk storage pointing to frontend/public/skills
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
+
+const localDiskStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const destPath = path.resolve(__dirname, '../../frontend/public/skills');
+    if (!fs.existsSync(destPath)) {
+      fs.mkdirSync(destPath, { recursive: true });
+    }
+    cb(null, destPath);
+  },
+  filename: (req, file, cb) => {
+    // Keep the original name
+    cb(null, file.originalname);
+  }
+});
+
+const uploadLocal = multer({
+  storage: localDiskStorage,
+});
+
+// @route   POST /api/skills/upload-local
+// @desc    Upload skill icon directly to frontend/public/skills folder
+// @access  Private
+router.post('/upload-local', protect, uploadLocal.single('file'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+    res.json({
+      message: 'Image uploaded successfully to local skills folder!',
+      filename: req.file.filename,
+      path: `/skills/${req.file.filename}`
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
 module.exports = router;
+
