@@ -6,36 +6,50 @@ import { Code, Monitor, Globe, BookOpen } from 'lucide-react';
 // Predefined list of extensions to try when fetching tech logos
 const EXTENSIONS = ['.svg', '.png', '.jpg', '.jpeg', '.webp'];
 
-// TechBadge component with automatic extension cycling and error handling
-const TechBadge = ({ tech }) => {
-  const [extIndex, setExtIndex] = useState(0);
-  const [imgFailed, setImgFailed] = useState(false);
-
-  // Sanitize name to match typical icon filenames:
-  //   - C++ -> cpp, C# -> csharp, Node.js -> nodejs, Vue.js -> vuejs, Tailwind CSS -> tailwindcss
-  const baseName = tech
+// Shared name normalizer — must match the sanitizer in Skills.jsx and backend
+const normalizeName = (name) =>
+  name
     .toLowerCase()
     .trim()
-    .replace(/\+\+/g, 'pp')       // C++ -> cpp
-    .replace(/#/g, 'sharp')        // C# -> csharp
-    .replace(/\.js$/g, 'js')       // Node.js -> nodejs
-    .replace(/\.ts$/g, 'ts')       // TypeScript.ts -> typescriptts (edge)
-    .replace(/[^a-z0-9]/g, '');   // strip remaining spaces, dots, etc.
-  const imgPath = `/skills/${baseName}${EXTENSIONS[extIndex]}`;
+    .replace(/\+\+/g, 'pp')
+    .replace(/#/g, 'sharp')
+    .replace(/\.js$/g, 'js')
+    .replace(/\.ts$/g, 'ts')
+    .replace(/[^a-z0-9]/g, '');
+
+// TechBadge: tries local /skills folder first, falls back to Cloudinary URL if provided
+const TechBadge = ({ tech, cloudinaryUrl }) => {
+  const [extIndex, setExtIndex] = useState(0);
+  // phase: 'local' | 'cloudinary' | 'failed'
+  const [phase, setPhase] = useState('local');
+
+  const baseName = normalizeName(tech);
+  const localPath = `/skills/${baseName}${EXTENSIONS[extIndex]}`;
 
   const handleImageError = () => {
-    if (extIndex < EXTENSIONS.length - 1) {
-      setExtIndex(extIndex + 1);
+    if (phase === 'local') {
+      if (extIndex < EXTENSIONS.length - 1) {
+        // Try next extension locally
+        setExtIndex(extIndex + 1);
+      } else if (cloudinaryUrl) {
+        // All local extensions exhausted — try Cloudinary
+        setPhase('cloudinary');
+      } else {
+        setPhase('failed');
+      }
     } else {
-      setImgFailed(true);
+      // Cloudinary also failed
+      setPhase('failed');
     }
   };
 
+  const imgSrc = phase === 'cloudinary' ? cloudinaryUrl : localPath;
+
   return (
     <div className="flex items-center gap-2.5 text-sm text-neutral-300 font-medium">
-      {!imgFailed ? (
+      {phase !== 'failed' ? (
         <img
-          src={imgPath}
+          src={imgSrc}
           alt={tech}
           className="w-7 h-7 object-contain shrink-0"
           onError={handleImageError}
@@ -96,23 +110,39 @@ const Projects = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
   const [categories, setCategories] = useState(['All']);
+  // Map: normalizedName -> cloudinary URL (for fallback)
+  const [skillIconMap, setSkillIconMap] = useState({});
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get('/projects');
-        setProjects(res.data);
+        // Fetch projects and skills in parallel
+        const [projRes, skillsRes] = await Promise.all([
+          api.get('/projects'),
+          api.get('/skills')
+        ]);
+
+        setProjects(projRes.data);
 
         // Extract unique categories from projects list
-        const uniqueCats = new Set(res.data.map((p) => p.category).filter(Boolean));
+        const uniqueCats = new Set(projRes.data.map((p) => p.category).filter(Boolean));
         setCategories(['All', ...Array.from(uniqueCats)]);
+
+        // Build normalized name -> cloudinary URL map
+        const map = {};
+        skillsRes.data.forEach((skill) => {
+          if (skill.icon?.url) {
+            map[normalizeName(skill.name)] = skill.icon.url;
+          }
+        });
+        setSkillIconMap(map);
       } catch (err) {
-        console.error('Error fetching projects:', err.message);
+        console.error('Error fetching data:', err.message);
       } finally {
         setLoading(false);
       }
     };
-    fetchProjects();
+    fetchData();
   }, []);
 
   const filteredProjects = filter === 'All'
@@ -195,7 +225,7 @@ const Projects = () => {
                   {project.technologies && project.technologies.length > 0 && (
                     <div className="flex flex-wrap gap-x-5 gap-y-5 mb-8">
                       {project.technologies.map((tech, idx) => (
-                        <TechBadge key={idx} tech={tech} />
+                        <TechBadge key={idx} tech={tech} cloudinaryUrl={skillIconMap[normalizeName(tech)]} />
                       ))}
                     </div>
                   )}
