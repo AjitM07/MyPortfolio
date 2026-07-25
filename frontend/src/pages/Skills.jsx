@@ -13,7 +13,16 @@ const SkillIcon = ({ name }) => {
     setImgFailed(false);
   }, [name]);
 
-  const baseName = name.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+  // Sanitize name to match typical icon filenames:
+  //   - C++ -> cpp, C# -> csharp, Node.js -> nodejs, Vue.js -> vuejs, Tailwind CSS -> tailwindcss
+  const baseName = name
+    .toLowerCase()
+    .trim()
+    .replace(/\+\+/g, 'pp')       // C++ -> cpp
+    .replace(/#/g, 'sharp')        // C# -> csharp
+    .replace(/\.js$/g, 'js')       // Node.js -> nodejs
+    .replace(/\.ts$/g, 'ts')       // TypeScript.ts edge
+    .replace(/[^a-z0-9]/g, '');   // strip remaining spaces, dots, etc.
   const imgPath = `/skills/${baseName}${EXTENSIONS[extIndex]}`;
 
   const handleImageError = () => {

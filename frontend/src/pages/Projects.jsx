@@ -11,8 +11,16 @@ const TechBadge = ({ tech }) => {
   const [extIndex, setExtIndex] = useState(0);
   const [imgFailed, setImgFailed] = useState(false);
 
-  // Sanitize name: lowercase and remove spaces & special characters (e.g., "Tailwind CSS" -> "tailwindcss")
-  const baseName = tech.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+  // Sanitize name to match typical icon filenames:
+  //   - C++ -> cpp, C# -> csharp, Node.js -> nodejs, Vue.js -> vuejs, Tailwind CSS -> tailwindcss
+  const baseName = tech
+    .toLowerCase()
+    .trim()
+    .replace(/\+\+/g, 'pp')       // C++ -> cpp
+    .replace(/#/g, 'sharp')        // C# -> csharp
+    .replace(/\.js$/g, 'js')       // Node.js -> nodejs
+    .replace(/\.ts$/g, 'ts')       // TypeScript.ts -> typescriptts (edge)
+    .replace(/[^a-z0-9]/g, '');   // strip remaining spaces, dots, etc.
   const imgPath = `/skills/${baseName}${EXTENSIONS[extIndex]}`;
 
   const handleImageError = () => {
