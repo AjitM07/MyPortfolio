@@ -3,7 +3,7 @@ const router = express.Router();
 const Project = require('../models/Project');
 const { protect } = require('../middleware/auth');
 const upload = require('../middleware/upload');
-const { cloudinary } = require('../config/cloudinary');
+const { cloudinary, uploadToCloudinary } = require('../config/cloudinary');
 
 // @route   GET /api/projects
 // @desc    Get all projects (ordered)
@@ -55,10 +55,11 @@ router.post('/', protect, upload.single('image'), async (req, res) => {
 
     let image = { url: '', publicId: '' };
     if (req.file) {
-      image = {
-        url: req.file.path,
-        publicId: req.file.filename
-      };
+      const result = await uploadToCloudinary(req.file.buffer, {
+        folder: 'portfolio/projects',
+        resource_type: 'image',
+      });
+      image = { url: result.secure_url, publicId: result.public_id };
     }
 
     const project = await Project.create({
@@ -70,7 +71,7 @@ router.post('/', protect, upload.single('image'), async (req, res) => {
       liveLink: liveLink || '',
       image,
       category: category || 'Web Development',
-      order: order ? Number(order) : 0
+      order: order ? Number(order) : 0,
     });
 
     res.status(201).json(project);
@@ -106,7 +107,7 @@ router.put('/:id', protect, upload.single('image'), async (req, res) => {
     }
 
     if (req.file) {
-      // Delete old image
+      // Delete old image from Cloudinary
       if (project.image && project.image.publicId) {
         try {
           await cloudinary.uploader.destroy(project.image.publicId);
@@ -114,10 +115,11 @@ router.put('/:id', protect, upload.single('image'), async (req, res) => {
           console.error('Failed to delete old project image:', cErr.message);
         }
       }
-      project.image = {
-        url: req.file.path,
-        publicId: req.file.filename
-      };
+      const result = await uploadToCloudinary(req.file.buffer, {
+        folder: 'portfolio/projects',
+        resource_type: 'image',
+      });
+      project.image = { url: result.secure_url, publicId: result.public_id };
     }
 
     await project.save();

@@ -3,7 +3,7 @@ const router = express.Router();
 const Certification = require('../models/Certification');
 const { protect } = require('../middleware/auth');
 const upload = require('../middleware/upload');
-const { cloudinary } = require('../config/cloudinary');
+const { cloudinary, uploadToCloudinary } = require('../config/cloudinary');
 
 // @route   GET /api/certifications
 // @desc    Get all certifications
@@ -30,10 +30,13 @@ router.post('/', protect, upload.single('file'), async (req, res) => {
 
     let file = { url: '', publicId: '' };
     if (req.file) {
-      file = {
-        url: req.file.path,
-        publicId: req.file.filename
-      };
+      const isPdf = req.file.mimetype === 'application/pdf';
+      const result = await uploadToCloudinary(req.file.buffer, {
+        folder: 'portfolio/certifications',
+        resource_type: isPdf ? 'raw' : 'image',
+        format: isPdf ? 'pdf' : undefined,
+      });
+      file = { url: result.secure_url, publicId: result.public_id };
     }
 
     const certification = await Certification.create({
@@ -42,7 +45,7 @@ router.post('/', protect, upload.single('file'), async (req, res) => {
       issueDate: new Date(issueDate),
       credentialUrl: credentialUrl || '',
       file,
-      order: order ? Number(order) : 0
+      order: order ? Number(order) : 0,
     });
 
     res.status(201).json(certification);
@@ -70,22 +73,24 @@ router.put('/:id', protect, upload.single('file'), async (req, res) => {
     if (order !== undefined) certification.order = Number(order);
 
     if (req.file) {
-      // Delete old file
+      // Delete old file from Cloudinary
       if (certification.file && certification.file.publicId) {
         const isPdf = certification.file.url.endsWith('.pdf') || certification.file.url.includes('/raw/');
         try {
-          await cloudinary.uploader.destroy(
-            certification.file.publicId,
-            isPdf ? { resource_type: 'raw' } : undefined
-          );
+          await cloudinary.uploader.destroy(certification.file.publicId, {
+            resource_type: isPdf ? 'raw' : 'image',
+          });
         } catch (cErr) {
           console.error('Failed to delete old certification file:', cErr.message);
         }
       }
-      certification.file = {
-        url: req.file.path,
-        publicId: req.file.filename
-      };
+      const isPdf = req.file.mimetype === 'application/pdf';
+      const result = await uploadToCloudinary(req.file.buffer, {
+        folder: 'portfolio/certifications',
+        resource_type: isPdf ? 'raw' : 'image',
+        format: isPdf ? 'pdf' : undefined,
+      });
+      certification.file = { url: result.secure_url, publicId: result.public_id };
     }
 
     await certification.save();
@@ -109,10 +114,9 @@ router.delete('/:id', protect, async (req, res) => {
     if (certification.file && certification.file.publicId) {
       const isPdf = certification.file.url.endsWith('.pdf') || certification.file.url.includes('/raw/');
       try {
-        await cloudinary.uploader.destroy(
-          certification.file.publicId,
-          isPdf ? { resource_type: 'raw' } : undefined
-        );
+        await cloudinary.uploader.destroy(certification.file.publicId, {
+          resource_type: isPdf ? 'raw' : 'image',
+        });
       } catch (cErr) {
         console.error('Failed to delete certification file on Cloudinary:', cErr.message);
       }

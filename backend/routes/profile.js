@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const https = require('https');
+const http = require('http');
 const Profile = require('../models/Profile');
 const { protect } = require('../middleware/auth');
 const upload = require('../middleware/upload');
-const { cloudinary } = require('../config/cloudinary');
+const { cloudinary, uploadToCloudinary } = require('../config/cloudinary');
 
 // @route   GET /api/profile
 // @desc    Get profile details
@@ -23,8 +24,8 @@ router.get('/', async (req, res) => {
           linkedin: 'https://www.linkedin.com/in/ajit-mangsulikar',
           twitter: '',
           instagram: 'https://www.instagram.com/ajit__m07/',
-          email: 'mailto:ajitmangsulikar123@gmail.com'
-        }
+          email: 'mailto:ajitmangsulikar123@gmail.com',
+        },
       });
     }
     res.json(profile);
@@ -36,73 +37,82 @@ router.get('/', async (req, res) => {
 // @route   PUT /api/profile
 // @desc    Update profile details & upload assets
 // @access  Private
-router.put('/', protect, upload.fields([
-  { name: 'aboutImage', maxCount: 1 },
-  { name: 'resumeUrl', maxCount: 1 }
-]), async (req, res) => {
-  try {
-    let profile = await Profile.findOne();
-    if (!profile) {
-      profile = new Profile();
-    }
-
-    const { name, title, bio, github, linkedin, twitter, instagram, email } = req.body;
-
-    if (name) profile.name = name;
-    if (title) profile.title = title;
-    if (bio) profile.bio = bio;
-
-    // Handle social links
-    profile.socialLinks = {
-      github: github !== undefined ? github : profile.socialLinks.github,
-      linkedin: linkedin !== undefined ? linkedin : profile.socialLinks.linkedin,
-      twitter: twitter !== undefined ? twitter : profile.socialLinks.twitter,
-      instagram: instagram !== undefined ? instagram : profile.socialLinks.instagram,
-      email: email !== undefined ? email : profile.socialLinks.email
-    };
-
-    // Handle uploaded files
-    if (req.files) {
-      if (req.files.aboutImage && req.files.aboutImage[0]) {
-        // Delete old image if exists
-        if (profile.aboutImage && profile.aboutImage.publicId) {
-          try {
-            await cloudinary.uploader.destroy(profile.aboutImage.publicId);
-          } catch (cErr) {
-            console.error('Failed to delete old aboutImage:', cErr.message);
-          }
-        }
-        profile.aboutImage = {
-          url: req.files.aboutImage[0].path,
-          publicId: req.files.aboutImage[0].filename
-        };
+router.put(
+  '/',
+  protect,
+  upload.fields([
+    { name: 'aboutImage', maxCount: 1 },
+    { name: 'resumeUrl', maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      let profile = await Profile.findOne();
+      if (!profile) {
+        profile = new Profile();
       }
 
-      if (req.files.resumeUrl && req.files.resumeUrl[0]) {
-        // Delete old resume if exists
-        if (profile.resumeUrl && profile.resumeUrl.publicId) {
-          try {
+      const { name, title, bio, github, linkedin, twitter, instagram, email } = req.body;
+
+      if (name) profile.name = name;
+      if (title) profile.title = title;
+      if (bio) profile.bio = bio;
+
+      // Handle social links
+      profile.socialLinks = {
+        github: github !== undefined ? github : profile.socialLinks.github,
+        linkedin: linkedin !== undefined ? linkedin : profile.socialLinks.linkedin,
+        twitter: twitter !== undefined ? twitter : profile.socialLinks.twitter,
+        instagram: instagram !== undefined ? instagram : profile.socialLinks.instagram,
+        email: email !== undefined ? email : profile.socialLinks.email,
+      };
+
+      // Handle uploaded files
+      if (req.files) {
+        if (req.files.aboutImage && req.files.aboutImage[0]) {
+          // Delete old image if exists
+          if (profile.aboutImage && profile.aboutImage.publicId) {
+            try {
+              await cloudinary.uploader.destroy(profile.aboutImage.publicId);
+            } catch (cErr) {
+              console.error('Failed to delete old aboutImage:', cErr.message);
+            }
+          }
+          const result = await uploadToCloudinary(req.files.aboutImage[0].buffer, {
+            folder: 'portfolio/profile',
+            resource_type: 'image',
+          });
+          profile.aboutImage = { url: result.secure_url, publicId: result.public_id };
+        }
+
+        if (req.files.resumeUrl && req.files.resumeUrl[0]) {
+          // Delete old resume if exists
+          if (profile.resumeUrl && profile.resumeUrl.publicId) {
             const isRaw = profile.resumeUrl.url && profile.resumeUrl.url.includes('/raw/');
-            await cloudinary.uploader.destroy(profile.resumeUrl.publicId, { resource_type: isRaw ? 'raw' : 'image' });
-          } catch (cErr) {
-            console.error('Failed to delete old resume:', cErr.message);
+            try {
+              await cloudinary.uploader.destroy(profile.resumeUrl.publicId, {
+                resource_type: isRaw ? 'raw' : 'image',
+              });
+            } catch (cErr) {
+              console.error('Failed to delete old resume:', cErr.message);
+            }
           }
+          const result = await uploadToCloudinary(req.files.resumeUrl[0].buffer, {
+            folder: 'portfolio/resume',
+            resource_type: 'raw',
+            format: 'pdf',
+            public_id: `${Date.now()}-resume`,
+          });
+          profile.resumeUrl = { url: result.secure_url, publicId: result.public_id };
         }
-        profile.resumeUrl = {
-          url: req.files.resumeUrl[0].path,
-          publicId: req.files.resumeUrl[0].filename
-        };
       }
+
+      await profile.save();
+      res.json(profile);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error', error: err.message });
     }
-
-    await profile.save();
-    res.json(profile);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
   }
-});
-
-const http = require('http');
+);
 
 // Helper: GET a URL, follow redirects (handles http↔https switches), pipe to res
 function proxyFile(url, res, redirectsLeft = 10) {
@@ -119,7 +129,6 @@ function proxyFile(url, res, redirectsLeft = 10) {
     hostname: parsedUrl.hostname,
     path: parsedUrl.pathname + parsedUrl.search,
     headers: {
-      // Some CDNs block requests without a User-Agent
       'User-Agent': 'Mozilla/5.0 (compatible; PortfolioBot/1.0)',
     },
   };
@@ -137,7 +146,6 @@ function proxyFile(url, res, redirectsLeft = 10) {
         return res.status(502).json({ message: 'Too many redirects from storage.' });
       }
       upstream.resume();
-      // Resolve relative redirect URLs against the current URL
       const next = new URL(upstream.headers.location, url).href;
       return proxyFile(next, res, redirectsLeft - 1);
     }
@@ -174,7 +182,6 @@ router.get('/download-resume', async (req, res) => {
 
     console.log('[download-resume] DB URL:', profile.resumeUrl.url);
     proxyFile(profile.resumeUrl.url, res);
-
   } catch (err) {
     console.error('[download-resume] DB error:', err.message);
     res.status(500).json({ message: 'Server error', error: err.message });

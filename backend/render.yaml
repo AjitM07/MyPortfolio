@@ -1,0 +1,56 @@
+services:
+  # ── Web Service (Backend API) ────────────────────────────────────────────────
+  - type: web
+    name: myportfolio-backend
+    env: node
+    region: oregon           # change to your preferred region
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false           # Set manually in Render dashboard
+      - key: JWT_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: CONTACT_RECIPIENT_EMAIL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false           # e.g. https://your-portfolio.netlify.app
+
+  # ── Cron Job (Keep-Alive Ping) ───────────────────────────────────────────────
+  # Render free-tier web services sleep after 15 minutes of inactivity.
+  # This cron pings the /health endpoint every 14 minutes to prevent cold starts.
+  - type: cron
+    name: myportfolio-keepalive
+    env: node
+    region: oregon
+    plan: free
+    schedule: "*/14 * * * *"   # every 14 minutes
+    buildCommand: "echo 'no build needed'"
+    startCommand: >
+      node -e "
+        const https = require('https');
+        const url = process.env.BACKEND_URL || 'https://myportfolio-backend.onrender.com/health';
+        https.get(url, (res) => {
+          console.log('[keep-alive] ping', url, '->', res.statusCode);
+        }).on('error', (e) => {
+          console.error('[keep-alive] error:', e.message);
+          process.exit(1);
+        });
+      "
+    envVars:
+      - key: BACKEND_URL
+        sync: false           # Set to: https://<your-render-service>.onrender.com/health

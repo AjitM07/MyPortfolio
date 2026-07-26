@@ -1,28 +1,31 @@
 const multer = require('multer');
-const { storage } = require('../config/cloudinary');
 
+// Use memory storage — files land in req.file.buffer
+// then get streamed to Cloudinary via uploadToCloudinary()
 const upload = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
   limits: {
-    fileSize: 1024 * 1024 * 10 // 10MB file size limit
+    fileSize: 1024 * 1024 * 10, // 10 MB
   },
   fileFilter: (req, file, cb) => {
-    // Allow common image formats and PDFs
     const allowedMimes = [
       'image/jpeg',
       'image/jpg',
       'image/png',
       'image/gif',
       'image/webp',
-      'application/pdf'
+      'application/pdf',
     ];
-    
+
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only JPG, JPEG, PNG, GIF, WEBP, and PDF files are allowed.'), false);
+      cb(
+        new Error('Invalid file type. Only JPG, JPEG, PNG, GIF, WEBP, and PDF files are allowed.'),
+        false
+      );
     }
-  }
+  },
 });
 
 module.exports = upload;

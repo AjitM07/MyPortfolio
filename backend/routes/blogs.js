@@ -3,7 +3,7 @@ const router = express.Router();
 const Blog = require('../models/Blog');
 const { protect } = require('../middleware/auth');
 const upload = require('../middleware/upload');
-const { cloudinary } = require('../config/cloudinary');
+const { cloudinary, uploadToCloudinary } = require('../config/cloudinary');
 
 // Simple slugify helper
 const slugify = (text) => {
@@ -131,18 +131,31 @@ const fetchLinkedInCaption = async (url) => {
   return '';
 };
 
+// Helper: upload a single file buffer to Cloudinary
+const uploadImage = async (buffer) => {
+  const result = await uploadToCloudinary(buffer, { folder: 'portfolio/blogs', resource_type: 'image' });
+  return { url: result.secure_url, publicId: result.public_id };
+};
+
+// Helper: delete an image from Cloudinary (silent fail)
+const destroyImage = async (publicId) => {
+  if (!publicId) return;
+  try {
+    await cloudinary.uploader.destroy(publicId);
+  } catch (err) {
+    console.error('Failed to delete Cloudinary image:', err.message);
+  }
+};
+
 // @route   GET /api/blogs
 // @desc    Get all blogs
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    // Return published blogs for public, or filter by query (e.g. status)
     const filter = {};
     if (req.query.status) {
       filter.status = req.query.status;
     } else {
-      // By default, public should only see published blogs
-      // We'll let the frontend specify or default to published
       filter.status = 'published';
     }
 
@@ -206,7 +219,7 @@ router.get('/:slug', async (req, res) => {
 router.post('/', protect, upload.fields([
   { name: 'image', maxCount: 1 },
   { name: 'image2', maxCount: 1 },
-  { name: 'image3', maxCount: 1 }
+  { name: 'image3', maxCount: 1 },
 ]), async (req, res) => {
   try {
     const { title, content, tags, status, isLinkedIn, linkedInUrl, publishedAt } = req.body;
@@ -245,24 +258,9 @@ router.post('/', protect, upload.fields([
     let image3 = { url: '', publicId: '' };
 
     if (req.files) {
-      if (req.files['image'] && req.files['image'][0]) {
-        image = {
-          url: req.files['image'][0].path,
-          publicId: req.files['image'][0].filename
-        };
-      }
-      if (req.files['image2'] && req.files['image2'][0]) {
-        image2 = {
-          url: req.files['image2'][0].path,
-          publicId: req.files['image2'][0].filename
-        };
-      }
-      if (req.files['image3'] && req.files['image3'][0]) {
-        image3 = {
-          url: req.files['image3'][0].path,
-          publicId: req.files['image3'][0].filename
-        };
-      }
+      if (req.files['image']?.[0])  image  = await uploadImage(req.files['image'][0].buffer);
+      if (req.files['image2']?.[0]) image2 = await uploadImage(req.files['image2'][0].buffer);
+      if (req.files['image3']?.[0]) image3 = await uploadImage(req.files['image3'][0].buffer);
     }
 
     let normalizedLinkedInUrl = '';
@@ -291,7 +289,7 @@ router.post('/', protect, upload.fields([
       status: status || 'draft',
       isLinkedIn: isLinkedInBool,
       linkedInUrl: normalizedLinkedInUrl,
-      publishedAt: finalPublishedAt
+      publishedAt: finalPublishedAt,
     });
 
     res.status(201).json(blog);
@@ -306,7 +304,7 @@ router.post('/', protect, upload.fields([
 router.put('/:id', protect, upload.fields([
   { name: 'image', maxCount: 1 },
   { name: 'image2', maxCount: 1 },
-  { name: 'image3', maxCount: 1 }
+  { name: 'image3', maxCount: 1 },
 ]), async (req, res) => {
   try {
     const { title, content, tags, status, isLinkedIn, linkedInUrl, publishedAt } = req.body;
@@ -316,7 +314,9 @@ router.put('/:id', protect, upload.fields([
       return res.status(404).json({ message: 'Blog not found' });
     }
 
-    const isLinkedInBool = isLinkedIn !== undefined ? (isLinkedIn === 'true' || isLinkedIn === true) : blog.isLinkedIn;
+    const isLinkedInBool = isLinkedIn !== undefined
+      ? (isLinkedIn === 'true' || isLinkedIn === true)
+      : blog.isLinkedIn;
 
     if (isLinkedInBool && !linkedInUrl && !blog.linkedInUrl) {
       return res.status(400).json({ message: 'LinkedIn URL is required for LinkedIn posts' });
@@ -365,49 +365,17 @@ router.put('/:id', protect, upload.fields([
     }
 
     if (req.files) {
-      if (req.files['image'] && req.files['image'][0]) {
-        // Delete old image
-        if (blog.image && blog.image.publicId) {
-          try {
-            await cloudinary.uploader.destroy(blog.image.publicId);
-          } catch (cErr) {
-            console.error('Failed to delete old blog image:', cErr.message);
-          }
-        }
-        blog.image = {
-          url: req.files['image'][0].path,
-          publicId: req.files['image'][0].filename
-        };
+      if (req.files['image']?.[0]) {
+        await destroyImage(blog.image?.publicId);
+        blog.image = await uploadImage(req.files['image'][0].buffer);
       }
-
-      if (req.files['image2'] && req.files['image2'][0]) {
-        // Delete old image2
-        if (blog.image2 && blog.image2.publicId) {
-          try {
-            await cloudinary.uploader.destroy(blog.image2.publicId);
-          } catch (cErr) {
-            console.error('Failed to delete old blog image2:', cErr.message);
-          }
-        }
-        blog.image2 = {
-          url: req.files['image2'][0].path,
-          publicId: req.files['image2'][0].filename
-        };
+      if (req.files['image2']?.[0]) {
+        await destroyImage(blog.image2?.publicId);
+        blog.image2 = await uploadImage(req.files['image2'][0].buffer);
       }
-
-      if (req.files['image3'] && req.files['image3'][0]) {
-        // Delete old image3
-        if (blog.image3 && blog.image3.publicId) {
-          try {
-            await cloudinary.uploader.destroy(blog.image3.publicId);
-          } catch (cErr) {
-            console.error('Failed to delete old blog image3:', cErr.message);
-          }
-        }
-        blog.image3 = {
-          url: req.files['image3'][0].path,
-          publicId: req.files['image3'][0].filename
-        };
+      if (req.files['image3']?.[0]) {
+        await destroyImage(blog.image3?.publicId);
+        blog.image3 = await uploadImage(req.files['image3'][0].buffer);
       }
     }
 
@@ -429,16 +397,11 @@ router.delete('/:id', protect, async (req, res) => {
     }
 
     // Delete images from Cloudinary
-    const imagesToDelete = [blog.image, blog.image2, blog.image3];
-    for (const img of imagesToDelete) {
-      if (img && img.publicId) {
-        try {
-          await cloudinary.uploader.destroy(img.publicId);
-        } catch (cErr) {
-          console.error('Failed to delete blog image on Cloudinary:', cErr.message);
-        }
-      }
-    }
+    await Promise.allSettled(
+      [blog.image, blog.image2, blog.image3]
+        .filter((img) => img?.publicId)
+        .map((img) => cloudinary.uploader.destroy(img.publicId))
+    );
 
     await blog.deleteOne();
     res.json({ message: 'Blog deleted' });
