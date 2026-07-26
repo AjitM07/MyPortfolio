@@ -38,6 +38,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+<<<<<<< HEAD
 // ─── Rate Limiting ───────────────────────────────────────────────────────────
 // General API limit
 const apiLimiter = rateLimit({
@@ -65,11 +66,23 @@ app.get('/health', (req, res) => {
 });
 
 // ─── Welcome Route ───────────────────────────────────────────────────────────
+=======
+// Welcome & Health Check Routes
+>>>>>>> d1fe33c37aa4c5fa3afb16030d08f3fdb0dc672c
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the Portfolio API!' });
 });
 
+<<<<<<< HEAD
 // ─── Routes ──────────────────────────────────────────────────────────────────
+=======
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+
+// Define Routes
+>>>>>>> d1fe33c37aa4c5fa3afb16030d08f3fdb0dc672c
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/projects', require('./routes/projects'));

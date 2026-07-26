@@ -113,4 +113,92 @@ router.delete('/:id', protect, async (req, res) => {
   }
 });
 
+// Configure local disk storage pointing to frontend/public/skills
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
+
+const localDiskStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const destPath = path.resolve(__dirname, '../../frontend/public/skills');
+    if (!fs.existsSync(destPath)) {
+      fs.mkdirSync(destPath, { recursive: true });
+    }
+    cb(null, destPath);
+  },
+  filename: (req, file, cb) => {
+    // Keep the original name
+    cb(null, file.originalname);
+  }
+});
+
+const uploadLocal = multer({
+  storage: localDiskStorage,
+});
+
+// @route   POST /api/skills/upload-local
+// @desc    Upload skill icon to local frontend/public/skills AND Cloudinary
+// @access  Private
+router.post('/upload-local', protect, uploadLocal.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const localPath = req.file.path;
+    const filename  = req.file.filename;
+
+    // Also upload to Cloudinary so it's available as a fallback CDN URL
+    let cloudinaryUrl = '';
+    let cloudinaryPublicId = '';
+    try {
+      const cloudResult = await cloudinary.uploader.upload(localPath, {
+        folder: 'portfolio/skills',
+        public_id: path.parse(filename).name, // e.g. "numpy" from "numpy.png"
+        overwrite: true,
+        resource_type: 'image'
+      });
+      cloudinaryUrl      = cloudResult.secure_url;
+      cloudinaryPublicId = cloudResult.public_id;
+    } catch (cErr) {
+      console.error('Cloudinary upload failed (local copy still saved):', cErr.message);
+    }
+
+    // Update the matching Skill document (case-insensitive name match)
+    if (cloudinaryUrl) {
+      try {
+        // Normalize: strip extension and use base filename as the skill name key
+        const baseName = path.parse(filename).name.toLowerCase();
+        // Find skill whose lowercase name matches
+        const skills = await Skill.find();
+        const matched = skills.find(s => {
+          const n = s.name.toLowerCase().trim()
+            .replace(/\+\+/g, 'pp')
+            .replace(/#/g, 'sharp')
+            .replace(/\.js$/g, 'js')
+            .replace(/\.ts$/g, 'ts')
+            .replace(/[^a-z0-9]/g, '');
+          return n === baseName;
+        });
+        if (matched) {
+          matched.icon = { url: cloudinaryUrl, publicId: cloudinaryPublicId };
+          await matched.save();
+        }
+      } catch (dbErr) {
+        console.error('Failed to update skill icon in DB:', dbErr.message);
+      }
+    }
+
+    res.json({
+      message: 'Image uploaded to local skills folder and Cloudinary!',
+      filename,
+      path: `/skills/${filename}`,
+      cloudinaryUrl
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
 module.exports = router;
+

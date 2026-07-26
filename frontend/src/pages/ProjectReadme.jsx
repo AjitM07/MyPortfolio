@@ -65,26 +65,26 @@ const ProjectReadme = () => {
 
         if (!githubRes.ok) {
           if (githubRes.status === 404) {
-            throw new Error('README.md file not found in the repository.');
+            throw new Error('file not found in the repository.');
           } else if (githubRes.status === 403) {
             throw new Error('GitHub API rate limit exceeded or access forbidden. Please try again later.');
           } else {
-            throw new Error(`Failed to fetch README from GitHub (${githubRes.statusText}).`);
+            throw new Error(`Failed to fetch (${githubRes.statusText}).`);
           }
         }
 
         const markdownText = await githubRes.text();
-        
+
         // 4. Parse markdown to HTML using marked
         const parsedHtml = await marked.parse(markdownText, {
           gfm: true,
           breaks: true,
         });
-        
+
         setReadmeHtml(parsedHtml);
       } catch (err) {
-        console.error('Error fetching project or README:', err);
-        setError(err.message || 'An unexpected error occurred while loading the project README.');
+        console.error('Error fetching project:', err);
+        setError(err.message || 'An unexpected error occurred while loading the project.');
       } finally {
         setLoading(false);
       }
@@ -144,8 +144,7 @@ const ProjectReadme = () => {
           )}
         </div>
       ) : (
-        <article className="glass-panel p-8 sm:p-10 rounded-[24px] border border-white/5 flex-grow">
-          {/* README Content Container with Custom Styles */}
+        <article className="glass-panel p-4 sm:p-10 rounded-[24px] border border-white/5 flex-grow">
           <div
             className="readme-content text-neutral-300 text-base leading-relaxed break-words"
             dangerouslySetInnerHTML={{ __html: readmeHtml }}
